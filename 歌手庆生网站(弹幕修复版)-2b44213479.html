@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生日快乐 - 歌手庆生网站</title>
+    <script src="https://cdn.tailwindcss.com/3.3.3"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #fff5f5 0%, #fff9f0 100%);
+            color: #4a4a4a;
+        }
+        
+        .handwriting {
+            font-family: 'Dancing Script', cursive;
+        }
+        
+        .gradient-text {
+            background: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .hero-gradient {
+            background: linear-gradient(45deg, rgba(255,215,0,0.2) 0%, rgba(255,182,193,0.3) 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 1s ease-in forwards;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        .timeline-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
+        }
+        
+        .timeline-line {
+            width: 2px;
+            background: linear-gradient(to bottom, #ff9a9e, #fad0c4);
+        }
+        
+        .cake-candle {
+            transition: all 0.3s ease;
+        }
+        
+        .cake-candle:hover {
+            transform: scale(1.1);
+        }
+        
+        .gift-box {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .gift-box:hover {
+            transform: scale(1.05) rotate(5deg);
+        }
+        
+        .star {
+            position: absolute;
+            color: gold;
+            animation: twinkle 2s infinite alternate;
+        }
+        
+        @keyframes twinkle {
+            from { opacity: 0.5; }
+            to { opacity: 1; }
+        }
+    </style>
+<style>
+/* 粒子背景样式 */
+#particleCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.6;
+}
+
+/*  hover动画效果 */
+.btn-hover {
+    transition: all 0.3s ease;
+}
+.btn-hover:hover {
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(255, 183, 3, 0.4);
+}
+</style>
+</head>
+<body class="min-h-screen">
+    <!-- 首页横幅 -->
+    <section class="hero-gradient min-h-screen flex items-center justify-center relative overflow-hidden">
+        <div class="absolute inset-0 overflow-hidden">
+            <div class="star text-2xl" style="top:20%; left:10%;">★</div>
+            <div class="star text-3xl" style="top:30%; left:80%;">★</div>
+            <div class="star text-xl" style="top:70%; left:15%;">★</div>
+            <div class="star text-4xl" style="top:60%; left:70%;">★</div>
+            <div class="star text-2xl" style="top:80%; left:50%;">★</div>
+        </div>
+        
+        <div class="container mx-auto px-4 py-16 text-center relative z-10">
+            <h1 class="text-5xl md:text-7xl font-bold mb-6 handwriting gradient-text">
+                生日快乐，<span class="text-yellow-500">[歌手名]</span>！
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 text-pink-600">愿你的歌声永远动人，梦想永远闪耀</p>
+            
+            <div class="flex justify-center space-x-4">
+                <div class="bg-white bg-opacity-80 rounded-full px-6 py-2 shadow-lg">
+                    <i class="fas fa-music text-pink-500 mr-2"></i>
+                    <span class="text-gray-700">特别改编歌曲</span>
+                </div>
+                <div class="bg-white bg-opacity-80 rounded-full px-6 py-2 shadow-lg">
+                    <i class="fas fa-heart text-pink-500 mr-2"></i>
+                    <span class="text-gray-700">粉丝祝福</span>
+                </div>
+            </div>
+            
+            <div class="mt-12 floating">
+                <i class="fas fa-chevron-down text-3xl text-pink-500"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- 歌曲播放区 -->
+    <section id="music" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 handwriting text-pink-600">
+                <i class="fas fa-music mr-4"></i>特别献唱
+            </h2>
+            
+            <div class="max-w-2xl mx-auto bg-gradient-to-r from-pink-50 to-yellow-50 rounded-2xl p-8 shadow-lg card-hover">
+                <div class="flex flex-col md:flex-row items-center">
+                    <div class="w-48 h-48 bg-pink-100 rounded-lg flex items-center justify-center mb-6 md:mb-0 md:mr-8">
+                        <i class="fas fa-music text-5xl text-pink-400"></i>
+                    </div>
+                    
+                    <div class="flex-1">
+                        <h3 class="text-2xl font-bold mb-2 text-gray-800">生日特别改编版</h3>
+                        <p class="text-gray-600 mb-4">[歌曲名称]</p>
+                        
+                        <div class="bg-white rounded-lg p-4 shadow-inner">
+                            <audio controls class="w-full">
+                                <source src="" type="audio/mpeg">
+                                您的浏览器不支持音频元素。
+                            </audio>
+                        </div>
+                        
+                        <div class="mt-4 bg-white rounded-lg p-4 shadow-inner h-32 overflow-y-auto">
+                            <p class="text-gray-700 text-center py-8">歌词加载中...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 粉丝祝福墙 -->
+    <section id="wishes" class="py-16 bg-pink-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 handwriting text-pink-600">
+                <i class="fas fa-heart mr-4"></i>粉丝祝福墙
+            </h2>
+            
+            <div class="max-w-4xl mx-auto bg-white rounded-2xl p-6 shadow-lg mb-8">
+                <h3 class="text-xl font-semibold mb-4 text-gray-800">留下你的祝福</h3>
+                <div class="flex flex-col md:flex-row gap-4">
+                    <input type="text" id="fanName" placeholder="你的名字" class="flex-1 p-3 border border-pink-200 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent">
+                    <textarea id="fanMessage" placeholder="写下你的祝福..." rows="2" class="flex-1 p-3 border border-pink-200 rounded-lg focus:ring-2 focus:ring-pink-300 focus:border-transparent"></textarea>
+                    <button id="submitWish" class="bg-pink-500 hover:bg-pink-600 text-white font-medium py-3 px-6 rounded-lg transition-colors shadow-md">
+                        <i class="fas fa-paper-plane mr-2"></i>发送
+                    </button>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="wishesContainer">
+                <!-- 示例祝福卡片 -->
+                <div class="bg-white rounded-xl p-6 shadow-md card-hover">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-500 mr-3">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-800">粉丝小明</h4>
+                    </div>
+                    <p class="text-gray-600 mb-4">从你出道就一直在听你的歌，祝你生日快乐！期待更多好作品！</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-400">2023-06-15</span>
+                        <button class="text-pink-400 hover:text-pink-600">
+                            <i class="far fa-heart"></i> 12
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl p-6 shadow-md card-hover">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-500 mr-3">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-800">粉丝小红</h4>
+                    </div>
+                    <p class="text-gray-600 mb-4">生日快乐！你的歌声陪伴我度过了很多艰难时刻，谢谢你！</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-400">2023-06-14</span>
+                        <button class="text-pink-400 hover:text-pink-600">
+                            <i class="far fa-heart"></i> 8
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 歌手历程时间线 -->
+    <section id="timeline" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 handwriting text-pink-600">
+                <i class="fas fa-award mr-4"></i>音乐历程
+            </h2>
+            
+            <div class="max-w-3xl mx-auto">
+                <div class="relative">
+                    <!-- 时间线 -->
+                    <div class="timeline-line absolute left-1/2 -translate-x-1/2 h-full"></div>
+                    
+                    <!-- 时间线项目 -->
+                    <div class="mb-12 flex items-center justify-between fade-in" style="animation-delay: 0.1s;">
+                        <div class="w-5/12 pr-8 text-right">
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">出道单曲发布</h3>
+                            <p class="text-gray-600">2015年3月</p>
+                            <p class="text-gray-600 mt-2">首支单曲《梦想起航》发布，获得广泛关注</p>
+                        </div>
+                        <div class="w-2/12 flex justify-center">
+                            <div class="timeline-dot relative">
+                                <div class="absolute inset-0 rounded-full bg-pink-200 animate-ping opacity-75"></div>
+                            </div>
+                        </div>
+                        <div class="w-5/12">
+                            <div class="w-full h-48 bg-pink-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-music text-4xl text-pink-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-12 flex items-center justify-between fade-in" style="animation-delay: 0.3s;">
+                        <div class="w-5/12">
+                            <div class="w-full h-48 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-trophy text-4xl text-yellow-400"></i>
+                            </div>
+                        </div>
+                        <div class="w-2/12 flex justify-center">
+                            <div class="timeline-dot relative">
+                                <div class="absolute inset-0 rounded-full bg-yellow-200 animate-ping opacity-75"></div>
+                            </div>
+                        </div>
+                        <div class="w-5/12 pl-8">
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">首个音乐奖项</h3>
+                            <p class="text-gray-600">2017年11月</p>
+                            <p class="text-gray-600 mt-2">荣获"年度最佳新人奖"，音乐才华获得认可</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-12 flex items-center justify-between fade-in" style="animation-delay: 0.5s;">
+                        <div class="w-5/12 pr-8 text-right">
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">首场个人演唱会</h3>
+                            <p class="text-gray-600">2019年5月</p>
+                            <p class="text-gray-600 mt-2">在国家体育馆举办万人演唱会，门票售罄</p>
+                        </div>
+                        <div class="w-2/12 flex justify-center">
+                            <div class="timeline-dot relative">
+                                <div class="absolute inset-0 rounded-full bg-pink-200 animate-ping opacity-75"></div>
+                            </div>
+                        </div>
+                        <div class="w-5/12">
+                            <div class="w-full h-48 bg-pink-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-microphone-alt text-4xl text-pink-400"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center justify-between fade-in" style="animation-delay: 0.7s;">
+                        <div class="w-5/12">
+                            <div class="w-full h-48 bg-yellow-100 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-globe-asia text-4xl text-yellow-400"></i>
+                            </div>
+                        </div>
+                        <div class="w-2/12 flex justify-center">
+                            <div class="timeline-dot relative">
+                                <div class="absolute inset-0 rounded-full bg-yellow-200 animate-ping opacity-75"></div>
+                            </div>
+                        </div>
+                        <div class="w-5/12 pl-8">
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">亚洲巡回演唱会</h3>
+                            <p class="text-gray-600">2022年8月</p>
+                            <p class="text-gray-600 mt-2">成功完成10个城市的亚洲巡演，影响力扩大</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 互动区域 -->
+    <section id="interactive" class="py-16 bg-pink-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 handwriting text-pink-600">
+                <i class="fas fa-gift mr-4"></i>生日互动
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <!-- 生日倒计时 -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg card-hover">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800 flex items-center">
+                        <i class="fas fa-birthday-cake text-pink-500 mr-3"></i>生日倒计时
+                    </h3>
+                    <div class="text-center py-6">
+                        <div class="text-4xl font-bold text-pink-500 mb-2" id="countdown">生日快乐！</div>
+                        <p class="text-gray-600">今天是你的特别日子</p>
+                    </div>
+                </div>
+                
+                <!-- 虚拟生日蛋糕 -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg card-hover">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800 flex items-center">
+                        <i class="fas fa-cake-candles text-pink-500 mr-3"></i>吹蜡烛许愿
+                    </h3>
+                    <div class="flex flex-col items-center py-4">
+                        <div class="relative mb-6">
+                            <div class="w-40 h-24 bg-pink-200 rounded-t-full rounded-b-none"></div>
+                            <div class="w-48 h-8 bg-yellow-200 rounded-full -mt-4 mx-auto"></div>
+                            <div class="w-32 h-32 bg-pink-100 rounded-full -mt-8 mx-auto"></div>
+                            
+                            <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 flex space-x-4">
+                                <div class="cake-candle w-2 h-12 bg-yellow-300 rounded-full" onclick="blowCandle(this)">
+                                    <div class="w-4 h-4 bg-red-500 rounded-full -mt-2 -ml-1 animate-pulse"></div>
+                                </div>
+                                <div class="cake-candle w-2 h-12 bg-yellow-300 rounded-full" onclick="blowCandle(this)">
+                                    <div class="w-4 h-4 bg-red-500 rounded-full -mt-2 -ml-1 animate-pulse"></div>
+                                </div>
+                                <div class="cake-candle w-2 h-12 bg-yellow-300 rounded-full" onclick="blowCandle(this)">
+                                    <div class="w-4 h-4 bg-red-500 rounded-full -mt-2 -ml-1 animate-pulse"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 text-center">点击蜡烛许下心愿</p>
+                    </div>
+                </div>
+                
+                <!-- 礼物盒 -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg card-hover col-span-1 md:col-span-2">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800 flex items-center justify-center">
+                        <i class="fas fa-gift text-pink-500 mr-3"></i>点击打开生日礼物
+                    </h3>
+                    <div class="flex justify-center py-4">
+                        <div class="gift-box w-32 h-32 bg-red-500 rounded-lg shadow-md flex items-center justify-center text-white text-4xl relative" onclick="openGift(this)">
+                            <i class="fas fa-gift"></i>
+                            <div class="absolute top-0 left-0 w-full h-8 bg-red-600 rounded-t-lg"></div>
+                            <div class="absolute top-4 left-1/2 -translate-x-1/2 w-16 h-4 bg-red-700 rounded-full"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="bg-pink-100 py-8 text-center text-gray-600">
+        <div class="container mx-auto px-4">
+            <p class="mb-2">created by <a href="https://space.coze.cn" class="text-pink-500 hover:text-pink-700">coze space</a></p>
+            <p class="text-sm">页面内容均由 AI 生成，仅供参考</p>
+        </div>
+    </footer>
+
+    <script>
+        // 祝福表单提交
+        document.getElementById('submitWish').addEventListener('click', function() {
+            const name = document.getElementById('fanName').value.trim();
+            const message = document.getElementById('fanMessage').value.trim();
+            
+            if(name && message) {
+                const wishCard = document.createElement('div');
+                wishCard.className = 'bg-white rounded-xl p-6 shadow-md card-hover';
+                wishCard.innerHTML = `
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-500 mr-3">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-800">${name}</h4>
+                    </div>
+                    <p class="text-gray-600 mb-4">${message}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-400">${new Date().toLocaleDateString()}</span>
+                        <button class="text-pink-400 hover:text-pink-600">
+                            <i class="far fa-heart"></i> 0
+                        </button>
+                    </div>
+                `;
+                
+                document.getElementById('wishesContainer').prepend(wishCard);
+                document.getElementById('fanName').value = '';
+                document.getElementById('fanMessage').value = '';
+                
+                // 保存到本地存储
+                const wishes = JSON.parse(localStorage.getItem('birthdayWishes') || '[]');
+                wishes.unshift({name, message, date: new Date().toISOString(), likes: 0});
+                localStorage.setItem('birthdayWishes', JSON.stringify(wishes));
+                
+                alert('祝福已发送！');
+            } else {
+                alert('请填写完整信息');
+            }
+        });
+        
+        // 加载本地存储的祝福
+        function loadWishes() {
+            const wishes = JSON.parse(localStorage.getItem('birthdayWishes') || '[]');
+            const container = document.getElementById('wishesContainer');
+            
+            // 清空示例卡片
+            container.innerHTML = '';
+            
+            wishes.forEach(wish => {
+                const wishCard = document.createElement('div');
+                wishCard.className = 'bg-white rounded-xl p-6 shadow-md card-hover';
+                wishCard.innerHTML = `
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-500 mr-3">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <h4 class="font-semibold text-gray-800">${wish.name}</h4>
+                    </div>
+                    <p class="text-gray-600 mb-4">${wish.message}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-gray-400">${new Date(wish.date).toLocaleDateString()}</span>
+                        <button class="text-pink-400 hover:text-pink-600">
+                            <i class="far fa-heart"></i> ${wish.likes}
+                        </button>
+                    </div>
+                `;
+                
+                container.appendChild(wishCard);
+            });
+        }
+        
+        // 吹蜡烛效果
+        function blowCandle(candle) {
+            const flame = candle.querySelector('div');
+            flame.style.display = 'none';
+            candle.style.opacity = '0.5';
+            
+            // 检查是否所有蜡烛都被吹灭
+            const candles = document.querySelectorAll('.cake-candle');
+            const allBlown = Array.from(candles).every(c => c.style.opacity === '0.5');
+            
+            if(allBlown) {
+                setTimeout(() => {
+                    alert('愿望已送达！祝你梦想成真！');
+                }, 500);
+            }
+        }
+        
+        // 打开礼物效果
+        function openGift(gift) {
+            gift.innerHTML = `
+                <div class="absolute inset-0 bg-white bg-opacity-90 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-heart text-pink-500 text-6xl animate-bounce"></i>
+                </div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <p class="text-pink-600 font-bold text-lg">感谢你的祝福！</p>
+                </div>
+            `;
+            gift.style.transform = 'scale(1.1) rotate(0deg)';
+            gift.style.cursor = 'default';
+        }
+        
+        // 生日倒计时
+        function updateCountdown() {
+            // 假设生日是6月20日
+            const now = new Date();
+            const birthday = new Date(now.getFullYear(), 5, 20); // 月份是0-11
+            
+            if(now.getMonth() === 5 && now.getDate() === 20) {
+                document.getElementById('countdown').textContent = '生日快乐！';
+                return;
+            }
+            
+            if(now > birthday) {
+                birthday.setFullYear(birthday.getFullYear() + 1);
+            }
+            
+            const diff = birthday - now;
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            
+            document.getElementById('countdown').textContent = `${days} 天`;
+        }
+        
+        // 页面加载时执行
+        document.addEventListener('DOMContentLoaded', function() {
+            loadWishes();
+            updateCountdown();
+            
+            // 滚动动画
+            const fadeElements = document.querySelectorAll('.fade-in');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if(entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                    }
+                });
+            }, {threshold: 0.1});
+            
+            fadeElements.forEach(el => observer.observe(el));
+        });
+    </script>
+<!-- 弹幕容器 -->
+<div id="danmakuContainer" style="position: fixed; top: 0; left: 0; width: 100%; height: 80%; pointer-events: none; z-index: 100;"></div>
+
+<!-- 弹幕发送框 -->
+<div style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 101;">
+    <input type="text" id="danmakuInput" placeholder="发送祝福弹幕..." style="padding: 8px 15px; width: 300px; border-radius: 20px; border: none; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+    <button onclick="sendDanmaku()" style="margin-left: 10px; padding: 8px 20px; border-radius: 20px; border: none; background: #ff9a3c; color: white; cursor: pointer;">发送</button>
+</div>
+
+<script>
+// 粒子背景效果
+const canvas = document.createElement('canvas');
+canvas.id = 'particleCanvas';
+document.body.appendChild(canvas);
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+class Particle {
+    constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 5 + 1;
+        this.speedX = Math.random() * 1 - 0.5;
+        this.speedY = Math.random() * 1 - 0.5;
+        this.color = `hsl(${Math.random() * 60 + 300}, 100%, 70%)`;
+    }
+    update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.size > 0.2) this.size -= 0.01;
+    }
+    draw() {
+        ctx.fillStyle = this.color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+function createParticles() {
+    particles.push(new Particle());
+}
+
+function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+        if (particles[i].size <= 0.2) {
+            particles.splice(i, 1);
+            i--;
+        }
+    }
+    requestAnimationFrame(animateParticles);
+}
+
+setInterval(createParticles, 50);
+animateParticles();
+
+// 弹幕功能
+function sendDanmaku() {
+    const input = document.getElementById('danmakuInput');
+    const text = input.value.trim();
+    if (!text) return;
+    
+    const danmaku = document.createElement('div');
+    danmaku.style.position = 'absolute';
+    danmaku.style.color = getRandomColor();
+    danmaku.style.fontSize = Math.random() * 16 + 14 + 'px';
+    danmaku.style.left = '100%';
+    danmaku.style.top = Math.random() * 70 + '%';
+    danmaku.style.whiteSpace = 'nowrap';
+    danmaku.style.pointerEvents = 'none';
+    danmaku.style.textShadow = '0 0 2px #000';
+    danmaku.textContent = text;
+    
+    document.getElementById('danmakuContainer').appendChild(danmaku);
+    
+    animateDanmaku(danmaku);
+    input.value = '';
+}
+
+function animateDanmaku(element) {
+    let position = window.innerWidth;
+    const speed = Math.random() * 2 + 1;
+    
+    function move() {
+        position -= speed;
+        element.style.left = position + 'px';
+        if (position < -element.offsetWidth) {
+            element.remove();
+            return;
+        }
+        requestAnimationFrame(move);
+    }
+    move();
+}
+
+function getRandomColor() {
+    const colors = ['#ff6b6b', '#4ecdc4', '#ffe66d', '#ff8a80', '#7bed9f', '#ffccbc'];
+    return colors[Math.floor(Math.random() * colors.length)];
+}
+
+// 点击发送按钮或按回车发送弹幕
+document.getElementById('danmakuInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') sendDanmaku();
+});
+</script>
+</body>
+</html>
