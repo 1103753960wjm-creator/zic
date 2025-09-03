@@ -3,638 +3,721 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>冯子晨应援站 - 生日倒计时</title>
+    <title>冯子晨生日应援</title>
     <script src="https://cdn.tailwindcss.com/3.3.3"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        @keyframes fadeIn {
-            0% { opacity: 0; transform: translateY(20px); }
-            100% { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes countUp {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(极简优化: 保留完整CSS代码) */
-        }
-        
-        /* 所有必要的CSS样式 */
         body {
-            background: linear-gradient(135deg, #0F3460 0%, #165DFF 100%);
-            color: #FFFFFF;
             font-family: 'Noto Sans SC', sans-serif;
-            min-height: 100vh;
-            scroll-behavior: smooth;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            color: #1e3a8a;
             overflow-x: hidden;
-            margin: 0;
-            padding: 0;
         }
-        
+
         .glassmorphism {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(10px);
-            border-radius: 10px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
-        .mobile-menu {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
+
+        .card-hover {
+            transition: all 0.3s ease;
         }
-        
-        .mobile-menu.active {
-            max-height: 300px;
+
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 28px 0 rgba(31, 38, 135, 0.2);
         }
-        
+
+        .blob {
+            position: absolute;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            filter: blur(60px);
+            opacity: 0.3;
+            border-radius: 50%;
+            animation: blob-movement 15s infinite linear;
+            z-index: -2;
+        }
+
+        @keyframes blob-movement {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(5%, -10%) scale(1.3); }
+            66% { transform: translate(-15%, 5%) scale(0.9); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        .highlight-text {
+            position: relative;
+            display: inline-block;
+        }
+
+        .highlight-text::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background-color: rgba(59, 130, 246, 0.2);
+            z-index: -1;
+        }
+
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        }
+
+        .shadow-glow {
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5);
+        }
+
+        .animate-pulse-slow {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .timeline-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #3b82f6;
+        }
+
+        .timeline-line {
+            width: 2px;
+            background-color: #e5e7eb;
+        }
+
+        /* 弹幕样式 */
         .danmu-container {
-            height: 16rem;
-            width: 100%;
-            position: relative;
-            overflow: hidden;
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 0.5rem;
-            border: 2px solid #FFD700;
-        }
-        
-        .danmu-item {
-            position: absolute;
-            white-space: nowrap;
-            font-size: 1.125rem;
-            font-weight: 500;
-            text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
-            animation-timing-function: linear;
-            animation-iteration-count: 1;
-            animation-fill-mode: forwards;
-        }
-        
-        .danmu-input-container {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            width: 90%;
-        }
-        
-        .danmu-input {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-        
-        .danmu-input:focus {
-            background: rgba(255, 255, 255, 0.3);
-            border-color: #FFD700;
-        }
-        
-        .danmu-send-btn {
-            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
-            color: #0F3460;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .danmu-send-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
-        }
-        
-        .danmu-loading {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
-            color: rgba(255, 255, 255, 0.7);
-        }
-        
-        .countdown-item {
-            transition: all 0.3s ease;
-        }
-        
-        .target-section {
-            padding-top: 80px;
-        }
-        
-        #giftBoxContainer {
-            perspective: 1000px;
-            width: 200px;
-            height: 200px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 100;
-        }
-        
-        #giftBox {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            transition: transform 1s ease;
-            cursor: pointer;
-            animation: float 4s ease-in-out infinite;
-        }
-        
-        #giftBox.opened {
-            transform: rotateX(-120deg);
-            animation: none;
-        }
-        
-        #giftBoxIcon {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 100px;
-            color: #FFD700;
-            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
-            transition: all 0.8s ease;
-        }
-        
-        #giftBox.opened #giftBoxIcon {
-            transform: translate(-50%, -50%) scale(0.8);
-            opacity: 0.5;
-        }
-        
-        #giftContent {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 0.5s ease 0.5s;
-            transform: translateY(30px);
-        }
-        
-        #giftBox.opened #giftContent {
-            opacity: 1;
-        }
-        
-        .gift-title {
-            font-size: 2rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-            text-align: center;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
-        }
-        
-        .star {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background-color: white;
-            border-radius: 50%;
-            opacity: 0.7;
-            animation: twinkle 3s infinite;
             pointer-events: none;
-        }
-        
-        .nav-active {
-            color: #FFD700 !important;
-            text-shadow: 0 0 5px rgba(255, 215, 0, 0.7);
-            position: relative;
-        }
-        
-        .nav-active::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: #FFD700;
-            animation: navUnderline 0.3s ease;
-        }
-        
-        .song-card {
-            transition: all 0.3s ease;
-            position: relative;
+            z-index: 100;
             overflow: hidden;
         }
-        
-        .hidden-element {
-            display: none !important;
+
+        .danmu {
+            position: absolute;
+            white-space: nowrap;
+            color: #fff;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            font-size: 16px;
+            animation: danmu-move linear;
+            animation-fill-mode: forwards;
         }
-        
-        .visible-element {
-            display: block;
+
+        @keyframes danmu-move {
+            from { transform: translateX(100vw); }
+            to { transform: translateX(-100%); }
         }
+
+        /* 礼物盒动画 */
         
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
+
+        .gift-box.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
-        
-        @keyframes glow {
-            0% { text-shadow: 0 0 5px rgba(255, 215, 0, 0.5); }
-            50% { text-shadow: 0 0 20px rgba极简优化: 保留关键动画 */
+
+        .gift-box img {
+            width: 200px;
+            height: 200px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
-        
-        @keyframes particleFly {
-            0% { transform: translate(0, 0) scale(0); opacity: 1; }
-            100% { transform: translate(var(--tx), var(--ty)) scale(1); opacity: 0; }
+
+        .gift-box img:hover {
+            transform: scale(1.1);
         }
-        
-        @keyframes contentFadeIn {
-            0% { opacity: 0; transform: translateY(50px); }
-            100% { opacity: 1; transform: translateY(0); }
+
+        .gift-box p {
+            color: white;
+            margin-top: 20px;
+            font-size: 18px;
         }
-        
-        @keyframes beamGlow {
-            0% { opacity: 0; transform: scale(0); }
-            50% { opacity: 0.8; transform: scale(1.5); }
-            100% { opacity: 0; transform: scale(2); }
+
+        /* 烟花特效 - 优化后的样式 */
+        .firework {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.8);
+            animation: firework-animation 3s ease-out forwards;
+            z-index: 100;
         }
-        
-        @keyframes twinkle {
-            0%, 100% { opacity: 0.2; }
-            50% { opacity: 1; }
+
+        @keyframes firework-animation {
+            0% { transform: translate(0, 0); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)); opacity: 0; }
         }
-        
-        @keyframes confettiFall {
-            0% { top: -20px; opacity: 1; transform: translateY(0) rotate(0deg); }
-            100% { top: 100vh; opacity: 0; transform: translateY(100px) rotate(720deg); }
+
+        .gold-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #FFD700 0%, #FFA500 100%);
+            box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.7);
+            animation: firework-animation 3s ease-out forwards;
+            z-index: 100;
         }
-        
-        @keyframes countUp {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
+
+        /* 隐藏音乐播放器 */
+        #birthdaySong {
+            display: none;
         }
-        
-        @keyframes navUnderline {
-            0% { transform: scaleX(0); }
-            100% { transform: scaleX(1); }
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        @keyframes openGift {
-            0% { transform: rotateX(0deg); }
-            100% { transform: rotateX(-120deg); }
-        }
-    </style>
-</head>
-<body>
-    <!-- 背景装饰元素 -->
-    <div class="stars-container"></div>
     
-    <!-- 礼物盒容器 -->
-    <div id="giftBoxContainer" class="flex justify-center items-center h-screen">
-        <div id="giftBox" class="glassmorphism">
-            <div id="g极简优化: 保留完整HTML结构) -->
-            <div id="giftBoxIcon">
-                <i class="fas fa-gift"></i>
-            </div>
-            <div id="giftContent">
-                <h2 class="gift-title">冯子晨应援站</h2>
-                <p class="text-yellow-300 mb-6">点击下方按钮进入</p>
-                <button id="enterBtn" class="bg-gradient-to-r from-yellow-400 to-yellow-600 text-white px-6 py-2 rounded-full shadow-lg hover:shadow-xl transition transform hover:scale-105">
-                    进入网站
-                </button>
-            </div>
+    /* 礼物盒覆盖层样式 */
+    .gift-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    
+    .gift-container {
+        text-align: center;
+    }
+    
+    .gift-image {
+        width: 220px;
+        height: 220px;
+        cursor: pointer;
+        transition: transform 0.4s ease;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+    
+    .gift-image:hover {
+        transform: scale(1.1) rotate(3deg);
+    }
+    
+    .click-text {
+        margin-top: 20px;
+        font-size: 20px;
+        color: #333;
+        text-shadow: 0 2px 8px rgba(255,255,255,0.9);
+    }
+    
+    .gift-overlay.hidden {
+        opacity: 0;
+        visibility: hidden;
+    }
+    
+    /* 网站内容样式 */
+    .website-content {
+        opacity: 0;
+        transition: opacity 0.9s ease-out 0.3s;
+    }
+    
+    .website-content.visible {
+        opacity: 1;
+    }
+    
+</style>
+</head>
+<body class="min-h-screen">
+
+    <!-- 初始覆盖层 -->
+    <div id="giftOverlay" class="gift-overlay">
+        <div class="gift-container">
+            <img src="https://img.jianbihua.com/sites/default/files/styles/photo640x425/public/images/2018-11/20181121152750_618778.jpg" 
+                 alt="生日礼物盒" class="gift-image">
+            <p class="click-text">点击礼盒开启</p>
         </div>
     </div>
+    
+    <div class="website-content">
+<div class="blob w-96 h-96 top-0 left-0"></div>
+    <div class="blob w-80 h-80 bottom-0 right-0"></div>
 
-    <!-- 主内容区 -->
-    <div id="mainContent" class="main-content hidden-element">
-        <!-- 顶部导航 -->
-        <nav id="mainNav" class="glassmorphism fixed top-0 left-0 right-0 z-40 py-3 px-6">
-            <div class="container mx-auto flex justify-between items-center">
-                <div class="text-2xl font-bold flex items-center">
-                    <i class="fas fa-music text-yellow-400 mr-2"></i>
-                    <span>冯子晨应援站</span>
-                </div>
-                <div class="hidden md:flex space-x-8">
-                    <a href="#danmuSection" class="nav-link hover:text-yellow-400 transition" data-target="danmuSection">粉丝弹幕</a>
-                    <a href="#countdownSection" class="nav-link hover:text-yellow-400 transition" data-target="countdownSection">生日倒计时</a>
-                    <a href="#songs" class="nav-link hover:text-yellow-400 transition" data-target="songs">热门歌曲</a>
-                    <a href="#timeline" class="nav-link hover:text-yellow-400 transition" data-target="timeline">歌手历程</a>
-                </div>
-                <button id="mobileMenuBtn" class="md:hidden text-2xl focus:outline-none">
-                    <i class="fas fa-bars"></i>
-                </button>
+    <!-- 礼物盒开场 -->
+    <div class="gift-box" id="giftBox">
+        <img src="https://img.jianbihua.com/sites/default/files/styles/photo640x425/public/images/2018-11/20181121152750_618778.jpg" alt="生日礼物盒" id="giftImage" style="width:200px;height:200px;object-fit:cover;">
+        <p>点击礼物盒开启冯子晨生日应援</p>
+    </div>
+
+    <!-- 弹幕容器 -->
+    <div class="danmu-container" id="danmuContainer"></div>
+
+    <!-- 导航条 -->
+    <nav class="glassmorphism sticky relative top-0 z-50 p-4 mb-8" id="mainNav">
+        <div class="container mx-auto flex items-center justify-between">
+            <div class="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">
+                <i class="fas fa-birthday-cake mr-2"></i>冯子晨生日应援
             </div>
+            <div class="hidden md:flex space-x-6">
+                <a href="#countdown" class="text-gray-600 hover:text-blue-600 transition-colors">生日倒计时</a>
+                <a href="#songs" class="text-gray-600 hover:text-blue-600 transition-colors">热门歌曲</a>
+                <a href="#timeline" class="text-gray-600 hover:text-blue-600 transition-colors">歌手历程</a>
+            </div>
+            <button class="md:hidden text-gray-600 focus:outline-none" id="mobileMenuButton" aria-label="导航菜单">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    
+    <div id="mobileMenu" class="hidden md:hidden absolute top-16 left-0 right-0 bg-white shadow-lg p-4 z-50">
+        <a href="#countdown" class="block py-2 text-gray-600 hover:text-blue-600">生日倒计时</a>
+        <a href="#songs" class="block py-2 text-gray-600 hover:text-blue-600">热门歌曲</a>
+        <a href="#timeline" class="block py-2 text-gray-600 hover:text-blue-600">歌手历程</a>
+    </div>
+    
+</nav>
+
+    <!-- 头部横幅 -->
+    <header class="container mx-auto py-16 px-4 md:px-8 relative text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6">
+            冯子晨 <span class="highlight-text">生日应援</span>
+        </h1>
+        <p class="text-xl md:text-2xl text-gray-600 mb-8">10月8日，让我们一起为TA送上最真挚的祝福</p>
+        <img src="https://s.coze.cn/image/idVtx0e5W30/" alt="冯子晨卡通形象" class="mx-auto rounded-full w-48 h-48 object-cover border-4 border-blue-500 shadow-lg">
+    </header>
+
+    <!-- 生日倒计时部分 -->
+    <section id="countdown" class="container mx-auto py-12 px-4 md:px-8">
+        <div class="glassmorphism p-8 mb-16">
+            <h2 class="text-3xl font-bold mb-6 flex items-center">
+                <div class="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-white mr-3">
+                    <i class="fas fa-clock"></i>
+                </div>
+                生日倒计时
+            </h2>
+            <div class="text-center">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="stat-card glassmorphism p-4 text-center">
+                        <div class="text-sm text-gray-500">天</div>
+                        <div class="text-3xl font-bold text-blue-600" id="days">00</div>
+                    </div>
+                    <div class="stat-card glassmorphism p-4 text-center">
+                        <div class="text-sm text-gray-500">时</div>
+                        <div class="text-3xl font-bold text-blue-600" id="hours">00</div>
+                    </div>
+                    <div class="stat-card glassmorphism p-4 text-center">
+                        <div class="text-sm text-gray-500">分</div>
+                        <div class="text-3xl font-bold text-blue-600" id="minutes">00</div>
+                    </div>
+                    <div class="stat-card glassmorphism p-4 text-center">
+                        <div class="text-sm text-gray-500">秒</div>
+                        <div class="text-3xl font-bold text-blue-600" id="seconds">00</div>
+                    </div>
+                </div>
+                <p class="text-gray-600 mb-4">距离冯子晨生日还有 <span id="countdownText" class="font-bold text-blue-600">...</span></p>
+                <div id="birthdayMessage" class="hidden">
+                    <p class="text-xl font-bold text-blue-600 mb-4">生日快乐！</p>
+                    <audio id="birthdaySong" controls class="mx-auto">
+                        <source src="https://qp139.bmwan.cn/sqrcode/audio?short=iAxPij&domain=fm.bmwwx.cn&sign=" type="audio/mpeg">
+                        您的浏览器不支持音频元素。
+                    </audio><script>
+
+    // 礼盒点击交互
+    document.addEventListener('DOMContentLoaded', function() {
+        const overlay = document.getElementById('giftOverlay');
+        const giftImage = document.querySelector('.gift-image');
+        const websiteContent = document.querySelector('.website-content');
+        
+        giftImage.addEventListener('click', function() {
+            // 隐藏覆盖层
+            overlay.classList.add('hidden');
             
-            <!-- 移动端导航菜单 -->
-            <div id="mobileMenu" class="mobile-menu md:hidden mt-2 glassmorphism">
-                <div class="p-4">
-                    <a href="#danmuSection" class="mobile-nav-link block py-2 hover:text-yellow-400 transition flex items-center" data-target="danmuSection">
-                        <i class="fas fa-comment-dots mr-2"></i>粉丝弹幕
-                    </a>
-                    <a href="#countdownSection" class="mobile-nav-link block py-2 hover:text-yellow-400 transition flex items-center" data-target="countdownSection">
-                        <i class="fas fa-birthday-cake mr-2"></i>生日倒计时
-                    </a>
-                    <a href="#songs" class="mobile-nav-link block py-2 hover:text-yellow-400 transition flex items-center" data-target极简优化: 保留完整HTML结构) 
-                        <i class="fas fa-music mr-2"></i>热门歌曲
-                    </a>
-                    <a href="#timeline" class="mobile-nav-link block py-2 hover:text-yellow-400 transition flex items-center" data-target="timeline">
-                        <i class="fas fa-history mr-2"></i>歌手历程
-                    </a>
+            // 显示网站内容
+            setTimeout(() => {
+                websiteContent.classList.add('visible');
+            }, 400);
+        });
+    });
+    
+        document.getElementById("birthdaySong").addEventListener("error", function() {
+            console.error("音频加载失败，请检查链接是否有效");
+            alert("音频加载失败，可能链接已过期或无效");
+        });
+    </script>
                 </div>
             </div>
-        </nav>
+        </div>
+    </section>
 
-        <div class="container mx-auto px-0 md:px-4 pt-24 pb-12">
-            <!-- 弹幕区域 -->
-            <div id="danmuSection" class="glassmorphism p-6 mb-8 mx-4 md:mx-0 target-section" data-nav-target="danmuSection">
-                <h2 class="text-2xl font-bold mb-6 flex items-center">
-                    <i class="fas fa-comment-dots text-yellow-500 mr-3"></i>
-                    <span>粉丝弹幕</span>
-                </h2>
-                <div class="danmu-container" id="danmuContainer">
-                    <div class="danmu-loading">
-                        <i class="fas fa-spinner fa-spin mr-2"></i> 弹幕加载中...
-                    </div>
+    <!-- 弹幕祝福部分 -->
+    <section class="container mx-auto py-12 px-4 md:px-8">
+        <div class="glassmorphism p-8 mb-16">
+            <h2 class="text-3xl font-bold mb-6 flex items-center">
+                <div class="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-white mr-3">
+                    <i class="fas fa-comment-dots"></i>
                 </div>
-                <div class="danmu-input-container">
-                    <input type="text" id="danmuInput" class="danmu-input" placeholder="发送弹幕为冯子晨应援..." maxlength="50">
-                    <button id="danmuSendBtn" class="danmu-send-btn">
-                        <i class="fas fa-paper-plane mr-1"></i>发送
-                    </button>
-                </div>
+                发送祝福弹幕
+            </h2>
+            <div class="flex flex-col md:flex-row gap-4">
+                <input type="text" id="usernameInput" placeholder="请输入您的昵称" class="flex-grow p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <input type="text" id="danmuInput" placeholder="写下你的祝福..." class="flex-grow p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <button id="sendDanmu" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                    <i class="fas fa-paper-plane mr-2"></i>发送
+                </button>
+            </div>
+            <p class="text-sm text-gray-500 mt-2">你的祝福将会在屏幕上飘过，让更多人看到！</p>
+        </div>
+    </section>
+
+    <!-- 热门歌曲部分 -->
+    <section id="songs" class="container mx-auto py-12 px-4 md:px-8">
+        <h2 class="text-3xl font-bold mb-12 text-center">热门歌曲</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div class="glassmorphism p-6 card-hover">
+                <img src="https://s.coze.cn/image/H4PZnp6hSXw/" alt="星光" class="w-full h-48 object-cover rounded-lg mb-4">
+                <h3 class="text-xl font-semibold mb-2">星光</h3>
+                <p class="text-gray-600 mb-4">冯子晨首张个人专辑主打歌</p>
+                
             </div>
 
-            <!-- 生日倒计时 -->
-            <div id="countdownSection" class="glassmorphism p-6 mb-8 mx-4 md:mx-0 target-section" data-nav-target="countdownSection">
-                <h2 class="text-2xl font-bold mb-6 flex items-center">
-                    <i class="fas fa-birthday-cake text-yellow-500 mr-3"></i>
-                    <span>冯子晨生日倒计时</span>
-                </h2>
-                <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div class="countdown-item text-center">
-                        <div id="days" class="text-5xl font-bold text-yellow-500">34</div>
-                        <div class="text-sm text-blue-200 mt-1">天</极简优化: 保留完整HTML结构) 
-                    </div>
-                    <div class="countdown-item text-center">
-                        <div id="hours" class="text-5xl font-bold text-yellow-500">09</div>
-                        <div class="text-sm text-blue-200 mt-1">时</div>
-                    </div>
-                    <div class="countdown-item text-center">
-                        <div id="minutes" class="text-5xl font-bold text-yellow-500">23</div>
-                        <div class="text-sm text-blue-200 mt-1">分</div>
-                    </div>
-                    <div class="countdown-item text-center">
-                        <div id="seconds" class="text-5xl font-bold text-yellow-500">48</div>
-                        <div class="text-sm text-blue-200 mt-1">秒</div>
-                    </div>
-                </div>
+            <div class="glassmorphism p-6 card-hover">
+                <img src="https://s.coze.cn/image/jCw00Qc3qm0/" alt="追梦人" class="w-full h-48 object-cover rounded-lg mb-4">
+                <h3 class="text-xl font-semibold mb-2">追梦人</h3>
+                <p class="text-gray-600 mb-4">励志单曲，鼓舞无数听众</p>
+                
             </div>
 
-            <!-- 热门歌曲 -->
-            <div id="songs" class="glassmorphism p-6 mb-8 mx-4 md:mx-0 target-section" data-nav-target="songs">
-                <h2 class="text-2xl font-bold mb-6 flex items-center">
-                    <i class="fas fa-music text-yellow-500 mr-3"></i>
-                    <span>热门歌曲</span>
-                </h2>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="song-card bg-blue-900 bg-opacity-30 rounded-xl overflow-hidden transition duration-300 cursor-pointer">
-                        <div class="p-3">
-                            <h3 class="font-semibold">半山腰</h3>
-                            <p class="text-sm text-blue-200">冯子晨</p>
-                        </div>
-                    </div>
-                    <div class="song-card bg-blue-900 bg-opacity-30 rounded-xl overflow-hidden transition duration-300 cursor-pointer">
-                        <div class="p-3">
-                            <h3 class="font-semibold">众山小</h3>
-                            <p class="text-sm text-blue-200">冯子晨</p>
-                        </div>
-                    </div>
-                    <div class="song-card bg-blue-900 bg-opacity-30 rounded-xl overflow-hidden transition duration-300 cursor-pointer">
-                        <div class="p-3">
-                            <h3 class="font-semibold">越山行</h3>
-                            <p class="text-sm text-blue-200">冯子晨</p>
-                        </div>
-                    </div>
-                    <div class="song-card bg-blue-900 bg-opacity-30 rounded-xl overflow-hidden transition duration-300 cursor-pointer">
-                        <div class="p-3">
-                            <h3 class="font-semibold">北伐</h3>
-                            <p class="text-sm text-blue-200">冯子晨</p>
-                        </div>
+            <div class="glassmorphism p-6 card-hover">
+                <img src="https://s.coze.cn/image/MHpplF5IKeQ/" alt="遇见你" class="w-full h-48 object-cover rounded-lg mb-4">
+                <h3 class="text-xl font-semibold mb-2">遇见你</h3>
+                <p class="text-gray-600 mb-4">甜蜜情歌，广受粉丝喜爱</p>
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- 歌手历程时间线部分 -->
+    <section id="timeline" class="container mx-auto py-12 px-4 md:px-8">
+        <div class="glassmorphism p-8">
+            <h2 class="text-3xl font-bold mb-6 flex items-center">
+                <div class="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-white mr-3">
+                    <i class="fas fa-history"></i>
+                </div>
+                歌手历程
+            </h2>
+
+            <div class="relative">
+                <!-- 时间线 -->
+                <div class="timeline-line absolute left-6 top-0 bottom-0"></div>
+
+                <!-- 时间线项目 -->
+                <div class="relative pl-16 pb-8">
+                    <div class="timeline-dot absolute left-6 top-2"></div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold text-blue-600">2018年</h3>
+                        <p class="text-gray-600">参加《明日之星》选秀节目，获得全国总冠军</p>
                     </div>
                 </div>
-            </div>
 
-            <!-- 歌手历程 -->
-            <div id="timeline" class="glassmorphism p-6 mb-8 mx-4 md:mx-0 target-section" data-nav-target="timeline">
-                <h2 class="text-2xl font-bold mb-6 flex items-center">
-                    <i class="fas fa-history text-yellow-500 mr-3"></i>
-                    <span>歌手历程</span>
-                </h2>
-                <div class="space-y-8">
-                    <!-- 2023年 -->
-                    <div class="timeline-item">
-                        <div class="flex items-center mb-4">
-                            <div class="w-10 h-10 rounded-full bg-yellow-500 text-blue-900 flex items-center justify-center mr-3 font-bold">
-                                2023
-                            </div>
-                            <h3 class="text-xl font-semibold">2023年</h3>
-                        </div>
-                        <div class="pl-13 border-l-2 border-yellow-500 border-opacity-30 space-y-4">
-                            <div class="relative pl-6">
-                                <div class="absolute -left-1.5 top-1.5 w-3 h-3 rounded-full bg-yellow-500"></div>
-                                <div class="text-blue-100">4月 发布《风与月》</div>
-                                <div class="timeline-detail mt-2 pl-4 text-blue-200 text-sm">
-                                    <p>冯子晨首支个人单曲，展现了其独特的音乐风格和创作才华。</p>
-                                </div>
-                            </div>
-                            <div class="relative pl-6">
-                                <div class="absolute -left-1.5 top-1.5 w-3 h-3 rounded-full bg-yellow-500"></div>
-                                <div class="text-blue-100">5月 发布《过千山》</div>
-                                <div class="timeline-detail mt-2 pl-4 text-blue-200 text-sm">
-                                    <p>励志风格的单曲，歌词充满正能量，获得广泛好评。</p>
-                                </div>
-                            </div>
-                        </div>
+                <div class="relative pl-16 pb-8">
+                    <div class="timeline-dot absolute left-6 top-2"></div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold text-blue-600">2019年</h3>
+                        <p class="text-gray-600">发行首张个人EP《初光》，销量突破百万</p>
                     </div>
-                    
-                    <!-- 2024年 -->
-                    <div class="timeline-item">
-                        <div class="flex items-center mb-4">
-                            <div class="w-10 h-10 rounded-full bg-yellow-500 text-blue-900 flex items-center justify-center mr-3 font-bold">
-                                2024
-                            </div>
-                            <h3 class="text-xl font-semibold">2024年</h3>
-                        </div>
-                        <div class="pl-13 border-l-2 border-yellow-500 border-opacity-30 space-y-4">
-                            <div class="relative pl-6">
-                                <div class="absolute -left-1.5 top-1.5 w-3 h-3 rounded-full bg-yellow-500"></div>
-                                <div class="text-blue-100">发布国风歌曲《众山小》MV</div>
-                                <div class="timeline-detail mt-2 pl-4 text-blue极简优化: 保留完整HTML结构) 
-                                    <p>精美的MV制作，融合了中国传统文化元素，展现了冯子晨对国风音乐的理解。</p>
-                                </div>
-                            </div>
-                        </div>
+                </div>
+
+                <div class="relative pl-16 pb-8">
+                    <div class="timeline-dot absolute left-6 top-2"></div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold text-blue-600">2020年</h3>
+                        <p class="text-gray-600">举办首次个人巡回演唱会"星光之旅"</p>
+                    </div>
+                </div>
+
+                <div class="relative pl-16 pb-8">
+                    <div class="timeline-dot absolute left-6 top-2"></div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold text-blue-600">2021年</h3>
+                        <p class="text-gray-600">获得年度最佳流行歌手奖</p>
+                    </div>
+                </div>
+
+                <div class="relative pl-16">
+                    <div class="timeline-dot absolute left-6 top-2"></div>
+                    <div class="bg-white p-4 rounded-lg shadow">
+                        <h3 class="text-xl font-semibold text-blue-600">2022年</h3>
+                        <p class="text-gray-600">发行第二张专辑《追梦人》，全球销量突破500万</p>
                     </div>
                 </div>
             </div>
         </div>
+    </section>
 
-        <!-- 页脚 -->
-        <footer class="text-center text-blue-300 py-6 glassmorphism mt-8">
-            <p>created by <a href="https://space.coze.cn" class="text-yellow-400 hover:underline">coze space</a></p>
-            <p class="text-sm mt-1">页面内容均由 AI 生成，仅供参考</p>
-        </footer>
-    </div>
+    <!-- 页脚 -->
+    <footer class="bg-blue-900 text-white py-8 mt-12">
+        <div class="container mx-auto px-4 text-center">
+            <p>© 2023 冯子晨生日应援网站</p>
+            <p class="mt-2 text-blue-200">created by <a href="https://space.coze.cn" class="underline hover:text-white">coze space</a></p>
+            <p class="text-sm text-blue-300 mt-2">页面内容均由 AI 生成，仅供参考</p>
+        </div>
+    </footer>
 
     <script>
-        // 修复后的礼物盒动画功能
-        function initGiftBox() {
-            const giftBox = document.getElementById('giftBox');
-            const enterBtn = document.getElementById('enterBtn');
-            const giftBoxContainer = document.getElementById('giftBoxContainer');
-            const mainContent = document.getElementById('mainContent');
+
+    // 礼盒点击交互
+    document.addEventListener('DOMContentLoaded', function() {
+        const overlay = document.getElementById('giftOverlay');
+        const giftImage = document.querySelector('.gift-image');
+        const websiteContent = document.querySelector('.website-content');
+        
+        giftImage.addEventListener('click', function() {
+            // 隐藏覆盖层
+            overlay.classList.add('hidden');
             
-            // 添加点击事件
-            giftBox.addEventListener('click', openGift);
-            enterBtn.addEventListener('click', openGift);
+            // 显示网站内容
+            setTimeout(() => {
+                websiteContent.classList.add('visible');
+            }, 400);
+        });
+    });
+    
+        // 礼物盒点击事件
+        document.getElementById('giftImage').addEventListener('click', function() {
+            document.getElementById('giftBox').classList.add('hidden');
+        });
+
+        // 生日倒计时
+        function updateCountdown() {
+            const now = new Date();
+            const targetDate = new Date(now.getFullYear(), 9, 8); // 10月8日 (月份从0开始)
             
-            function openGift(e) {
-                e.preventDefault();
-                
-                // 添加打开动画
-                giftBox.classList.add('opened');
-                
-                // 1.5秒后显示主内容
+            // 如果今年生日已过，计算明年生日
+            if (now > targetDate) {
+                targetDate.setFullYear(targetDate.getFullYear() + 1);
+            }
+            
+            const diff = targetDate - now;
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            document.getElementById('days').textContent = days.toString().padStart(2, '0');
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+            
+            document.getElementById('countdownText').textContent = `${days}天${hours}小时${minutes}分钟${seconds}秒`;
+            
+            // 如果倒计时结束
+            if (diff <= 0) {
+                clearInterval(countdownInterval);
+                triggerBirthdayCelebration();
+            }
+        }
+        
+        const countdownInterval = setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // 触发生日庆祝效果 - 优化后的烟花特效
+        function triggerBirthdayCelebration() {
+            document.getElementById('countdownText').textContent = "生日快乐！";
+            document.getElementById('birthdayMessage').classList.remove('hidden');
+            // 显示音乐播放器并播放
+            document.getElementById('birthdaySong').style.display = 'block';
+            createFireworks();
+            document.getElementById('birthdaySong').play();
+        }
+
+        // 优化后的烟花特效
+        function createFireworks() {
+            const colors = [
+                '#FF0000', '#FF4500', '#FF8C00', '#FFA500', 
+                '#FFD700', '#FFFF00', '#9ACD32', '#00FF00',
+                '#00FA9A', '#00BFFF', '#1E90FF', '#0000FF',
+                '#8A2BE2', '#9932CC', '#DA70D6', '#FF1493'
+            ];
+            
+            // 粒子数量增加至原来的2倍
+            for (let i = 0; i < 100; i++) {
                 setTimeout(() => {
-                    giftBoxContainer.style.display = 'none';
-                    mainContent.classList.remove('hidden-element');
-                    mainContent.classList.add('visible-element');
+                    // 创建彩色粒子
+                    const firework = document.createElement('div');
+                    firework.className = 'firework';
+                    firework.style.left = `${Math.random() * 100}%`;
+                    firework.style.top = `${Math.random() * 100}%`;
+                    firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
                     
-                    // 初始化主内容区功能
-                    initMobileMenu();
-                    initDanmuSystem();
-                    initCountdown();
-                    initNavigation();
-                }, 1500);
-            }
-        }
-        
-        // 初始化移动端菜单
-        function initMobileMenu() {
-            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-            const mobileMenu = document.getElementById('mobileMenu');
-            
-            mobileMenuBtn.addEventListener('click', () => {
-                mobileMenu.classList.toggle('active');
-                mobileMenuBtn.querySelector('i').classList.toggle('fa-bars');
-                mobileMenuBtn.querySelector('i').classList.toggle('fa-times');
-            });
-            
-            // 点击菜单项后关闭菜单
-            document.querySelectorAll('#mobileMenu a').forEach(link => {
-                link.addEventListener('click', () => {
-                    mobileMenu.classList.remove('active');
-                    mobileMenuBtn.querySelector('i').classList.remove('fa-times');
-                    mobileMenuBtn.querySelector('i').classList.add('fa-bars');
-                });
-            });
-        }
-        
-        // 初始化弹幕系统
-        class DanmuSystem {
-            constructor() {
-                this.container = document.getElementById('danmuContainer');
-                this.input = document.getElementById('danmuInput');
-                this.sendBtn = document.getElementById('danmuSendBtn');
-                this.danmuList = [];
-                this.maxHistory = 20;
-                this.colors = ['#FFFFFF', '#FFD700', '#87CEFA'];
-                this.tracks = [20, 40, 60, 80, 100, 120];
-                
-                this.init();
-            }
-            
-            init() {
-                this.loadHistory();
-                this.setupEventListeners();
-                this.startDanmuLoop();
-            }
-            
-            loadHistory() {
-                try {
-                    const savedDanmu = localStorage.getItem('fzcDanmu');
-                    if (savedDanmu) {
-                        this.danmuList = JSON.parse(savedDanmu).slice(-this.maxHistory);
-                    } else {
-                        // 默认弹幕
-                        this.danmuList = [
-                            { id: Date.now(), text: "冯子晨加油！", color: "#FFD700" },
-                            { id: Date.now()+1, text: "期待新专辑！", color: "#FFFFFF" },
-                            { id: Date.now()+2, text: "半山腰太好听了", color: "#87CEFA" }
-                        ];
+                    // 扩大扩散范围30%
+                    const tx = (Math.random() - 0.5) * 260; // 原200，增加30%
+                    const ty = (Math.random() - 0.5) * 260; // 原200，增加30%
+                    firework.style.setProperty('--tx', `${tx}px`);
+                    firework.style.setProperty('--ty', `${ty}px`);
+                    
+                    document.body.appendChild(firework);
+                    
+                    // 动画结束后移除元素
+                    setTimeout(() => {
+                        firework.remove();
+                    }, 3000);
+                    
+                    // 添加金色闪光粒子
+                    if (i % 5 === 0) {
+                        const goldParticle = document.createElement('div');
+                        goldParticle.className = 'gold-particle';
+                        goldParticle.style.left = `${Math.random() * 100}%`;
+                        goldParticle.style.top = `${Math.random() * 100}%`;
+                        
+                        const goldTx = (Math.random() - 0.5) * 260;
+                        const goldTy = (Math.random() - 0.5) * 260;
+                        goldParticle.style.setProperty('--tx', `${goldTx}px`);
+                        goldParticle.style.setProperty('--ty', `${goldTy}px`);
+                        
+                        document.body.appendChild(goldParticle);
+                        
+                        setTimeout(() => {
+                            goldParticle.remove();
+                        }, 3000);
                     }
-                } catch (e) {
-                    console.error('弹幕历史加载失败:', e);
-                }
-                
-                // 移除加载提示
-                this.container.innerHTML = '';
+                }, i * 50);
             }
+        }
+
+        // 弹幕功能
+        const danmuColors = ['#3b82f6', '#1d4ed8', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+        
+        document.getElementById("sendDanmu").addEventListener("click", function() {
+            const username = document.getElementById("usernameInput").value.trim() || "匿名";
+            const text = document.getElementById("danmuInput").value.trim();
+            if (text) {
+                sendDanmu(username, text);
+                document.getElementById("usernameInput").value = ""; // 清空昵称输入框
+                document.getElementById("danmuInput").value = ""; // 清空祝福语输入框
+                document.getElementById('danmuInput').value = '';
+            }
+        });
+        
+        document.getElementById("danmuInput").addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                const username = document.getElementById("usernameInput").value.trim() || "匿名";
+                const text = this.value.trim();
+                if (text) {
+                    sendDanmu(username, text);
+                    document.getElementById("usernameInput").value = ""; // 清空昵称输入框
+                    this.value = ""; // 清空祝福语输入框
+                    this.value = '';
+                }
+            }
+        });
+        
+        function sendDanmu(username, text) {
+            const danmu = document.createElement('div');
+            danmu.className = 'danmu';
+            danmu.textContent = username + "：" + text;
+            danmu.style.color = danmuColors[Math.floor(Math.random() * danmuColors.length)];
             
-            setupEventListeners() {
-                this.sendBtn.addEventListener('click', () => this.sendDanmu());
-                this.input.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') this.sendDanmu();
+            danmu.style.color = danmuColors[Math.floor(Math.random() * danmuColors.length)];
+            
+            // 随机高度
+            const top = Math.random() * 80 + 10; // 10% - 90%
+            danmu.style.top = `${top}%`;
+            
+            // 随机速度
+            const duration = Math.random() * 10 + 5; // 5-15秒
+            danmu.style.animationDuration = `${duration}s`;
+            
+            document.getElementById('danmuContainer').appendChild(danmu);
+            
+            // 动画结束后移除元素
+            setTimeout(() => {
+                danmu.remove();
+            }, duration * 1000);
+        }
+        
+        // 模拟一些初始弹幕
+        const sampleDanmus = [
+            {username: "粉丝1", text: "冯子晨生日快乐！"},
+            {username: "粉丝2", text: "永远支持你！"},
+            {username: "粉丝3", text: "新专辑大卖！"},
+            {username: "粉丝4", text: "期待你的演唱会！"},
+            {username: "粉丝5", text: "你是最棒的！"},
+            {username: "粉丝6", text: "生日快乐，爱你！"},
+            {username: "粉丝7", text: "祝事业蒸蒸日上！"},
+            {username: "粉丝8", text: "期待更多好作品！"}
+        ];
+        
+        // 初始发送一些弹幕
+        sampleDanmus.forEach((item, i) => {
+            setTimeout(() => {
+                sendDanmu(item.username, item.text);
+            }, i * 2000);
+        });
+        
+        // 每隔一段时间发送一条弹幕
+        setInterval(() => {
+            const randomItem = sampleDanmus[Math.floor(Math.random() * sampleDanmus.length)];
+            sendDanmu(randomItem.username, randomItem.text);
+        }, 5000);
+
+        // 移动端导航菜单切换
+        const menuButton = document.getElementById('mobileMenuButton');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        menuButton.addEventListener('click', function() {
+            mobileMenu.classList.toggle('hidden');
+
+            // 切换图标
+            const icon = this.querySelector('i');
+            if (mobileMenu.classList.contains('hidden')) {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            } else {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-times');
+            }
+        });
+
+        // 点击页面其他区域关闭移动端菜单
+        document.addEventListener('click', function(event) {
+            const isClickInsideNav = document.getElementById('mainNav').contains(event.target);
+
+            if (!isClickInsideNav && !mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.add('hidden');
+                const icon = menuButton.querySelector('i');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            }
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
                 });
-            }
-            
-            sendDanmu() {
-                const text = this.input.value.trim();
-                if (!text) return;
-                
-                const color = this.colors[Math.floor(Math.random() * this.colors.length)];
-                const newDanmu = {
-                    id: Date.now(),
-                    text: text,
-                    color: color
-                };
-                
-                this.danmuList.push(newDanmu);
-                this.saveToLocalStorage();
-                this.showDanmu(newDanmu);
-                
-                this.input.value = '';
-            }
-            
-            saveToLocalStorage() {
-                try {
-                    localStorage.setItem('fzcDanmu', JSON.stringify(this.danmuList.slice(-this.maxHistory)));
-                } catch (e) {
-                    console.error('弹幕保存失败:', e);
+
+                // 点击导航链接后关闭移动端菜单
+                if (!mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                    const icon = menuButton.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
                 }
-            }
-            
-            showDanmu(danmu) {
-                const danmuElement = document.createElement('div');
-                danmuElement.className = 'danmu-item';
-                danmuElement.textContent = danmu.text;
-                danmuElement.style.color = danmu.color;
-                
-                // 随机轨道
-                const trackIndex = Math.floor(Math.random() * this.tracks.length);
-                danmuElement.style.top = `${this.tracks[trackIndex]}px`;
-                
-                // 随机速度
-                const duration = Math.floor(Math.random() * 3) + 3; // 3-6秒
-                
-                // 初始位置在右侧
-                danmuElement.style.left = '100%';
-                this.container.appendChild(danmuElement);
+            });
+        });
+    </script>
+</div>
+</body>
+</html>
