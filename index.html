@@ -3,35 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>冯子晨生日应援</title>
+    <title>一个惊喜的网站</title>
+    
+    <!-- 优化后的资源引入 -->
     <script src="https://cdn.tailwindcss.com/3.3.3"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leancloud-storage@4.13.2/dist/av-min.js"></script>
+ 
     <style>
+        /* 全局样式优化 */
         body {
             font-family: 'Noto Sans SC', sans-serif;
-            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-            color: #1e3a8a;
+            background: linear-gradient(135deg, #0a0a2a 0%, #1a1a4a 100%);
+            color: #ffffff;
             overflow-x: hidden;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
         }
 
+        /* 进度条样式 */
+        #loading-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff8a00, #ff0080);
+            width: 0%;
+            z-index: 9999;
+            transition: width 0.3s ease;
+        }
+
+        /* 烟花容器样式 */
+        #fireworks-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            display: none; /* 初始隐藏 */
+        }
+
+        /* 毛玻璃效果优化 */
         .glassmorphism {
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(10px);
             border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
         }
 
-        .card-hover {
+        /* 移动端优化 */
+        @media (max-width: 768px) {
+            .wish-card {
+                font-size: 14px;
+                padding: 12px;
+            }
+            
+            .wish-author {
+                font-size: 16px;
+            }
+            
+            #wishContainer, #moreWishContainer {
+                grid-template-columns: 1fr !important;
+                gap: 12px;
+            }
+            
+            #viewMoreBtn, #viewLessBtn {
+                width: 100%;
+                padding: 12px;
+            }
+        }
+
+        /* 祝福卡片动画 */
+        .wish-card {
+            transition: all 0.3s ease;
+            transform-origin: center top;
+        }
+
+        .wish-card.hidden {
+            opacity: 0;
+            transform: scale(0.95);
+            height: 0;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        .collapse-transition {
             transition: all 0.3s ease;
         }
 
+        /* 卡片悬停效果优化 */
+        .card-hover {
+            transition: all 0.3s ease;
+        }
         .card-hover:hover {
             transform: translateY(-5px);
-            box-shadow: 0 12px 28px 0 rgba(31, 38, 135, 0.2);
+            box-shadow: 0 12px 28px 0 rgba(255, 215, 0, 0.3);
         }
 
+        /* 祝福卡片悬停效果优化 */
+        .wish-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .wish-card:hover {
+            transform: translateY(-5px) rotate(2deg);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        /* 导航链接悬停效果优化 */
+        .desktop-nav-link {
+            font-weight: 600;
+            color: #cec043;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .desktop-nav-link:hover {
+            color: #05abf8;
+            text-shadow: 0 0 10px rgba(2, 90, 255, 0.5);
+        }
+
+        #mobileMenu a.mobile-nav-link {
+            color: #cec043;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            display: block;
+            padding: 0.5rem 1rem;
+        }
+
+        #mobileMenu a.mobile-nav-link:hover {
+            color: #05abf8 !important;
+            text-shadow: 0 0 10px rgba(2, 90, 255, 0.5);
+        }
+
+        #mobileMenu .mobile-nav-link:hover,
+        #mobileMenu .mobile-nav-link:active {
+            transform: translateX(5px);
+        }
+
+        /* 社交按钮悬停效果优化 */
+        .social-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* 播放按钮悬停效果优化 */
+        .play-button {
+            background: linear-gradient(135deg, #ff8a00 0%, #ff0080 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 138, 0, 0.4);
+        }
+
+        .play-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 138, 0, 0.6);
+        }
+
+        /* 礼物图片悬停效果优化 */
+        .gift-image {
+            width: 220px;
+            height: 220px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(255, 215, 0, 0.4);
+        }
+
+        .gift-image:hover {
+            transform: scale(1.05) rotate(3deg);
+            box-shadow: 0 12px 32px rgba(255, 215, 0, 0.6);
+        }
+        
+        /* 卡片缩放效果优化 */
+        .card-scale {
+            transform: scale(0.85);
+            transform-origin: center;
+        }
+
+        /* 增强导航条毛玻璃效果 */
+        #mainNav.glassmorphism {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.25);
+        }
+        
+        /* 增强移动端菜单毛玻璃效果 */
+        #mobileMenu.glassmorphism {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 
+                0 0 0 1px rgba(255, 255, 255, 0.3),
+                0 0 20px 5px rgba(255, 215, 0, 0.2),
+                0 15px 50px 0 rgba(31, 38, 135, 0.4);
+        }
+
+        /* 修改弹幕容器样式 */
+        .danmu-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            overflow: hidden; /* 确保隐藏滚动条 */
+        }
+
+        /* 确保弹幕容器没有溢出 */
+        .danmu-container {
+            overflow: hidden !important;
+        }
+
+        .danmu-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .danmu {
+            position: absolute;
+            white-space: nowrap;
+            color: #fff;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            font-size: 16px;
+            animation: danmu-move linear forwards;
+        }
+
+        @keyframes danmu-move {
+            from { transform: translateX(100vw); }
+            to { transform: translateX(-100%); }
+        }
+
+        .danmu {
+            position: absolute;
+            white-space: nowrap;
+            color: #fff;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+            font-size: 16px;
+        }
+
+        /* 背景斑点效果优化 */
         .blob {
             position: absolute;
             background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
@@ -49,71 +290,13 @@
             100% { transform: translate(0, 0) scale(1); }
         }
 
-        .highlight-text {
-            position: relative;
-            display: inline-block;
-        }
-
-        .highlight-text::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 10px;
-            background-color: rgba(59, 130, 246, 0.2);
-            z-index: -1;
-        }
-
-        .bg-gradient-primary {
-            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-        }
-
-        .shadow-glow {
-            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5);
-        }
-
-        .animate-pulse-slow {
-            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .timeline-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background-color: #3b82f6;
-        }
-
-        .timeline-line {
-            width: 2px;
-            background-color: #e5e7eb;
-        }
-
-        /* 弹幕样式 */
-        .danmu-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 100;
-            overflow: hidden;
-        }
-
         .danmu {
             position: absolute;
             white-space: nowrap;
             color: #fff;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
             font-size: 16px;
-            animation: danmu-move linear;
-            animation-fill-mode: forwards;
+            animation: danmu-move linear forwards;
         }
 
         @keyframes danmu-move {
@@ -121,603 +304,2411 @@
             to { transform: translateX(-100%); }
         }
 
-        /* 礼物盒动画 */
-        
-
-        .gift-box.hidden {
-            opacity: 0;
-            pointer-events: none;
+        /* 高亮文本效果优化 */
+        .highlight-text {
+            position: relative;
+            display: inline-block;
+        }
+        .highlight-text::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background-color: rgba(255, 215, 0, 0.4);
+            z-index: -1;
         }
 
-        .gift-box img {
-            width: 200px;
+        /* 慢速脉冲动画优化 */
+        .animate-pulse-slow {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* 时间线样式优化 */
+        .timeline-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ffd700;
+        }
+        .timeline-line {
+            width: 2px;
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* 礼物盒覆盖层样式优化 */
+        .gift-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(10, 10, 42, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+    
+        .gift-container {
+            text-align: center;
+        }
+    
+        .click-text {
+            margin-top: 20px;
+            font-size: 20px;
+            color: #ffd700;
+            text-shadow: 0 2px 8px rgba(255, 215, 0, 0.5);
+        }
+    
+        .gift-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+    
+        .website-content {
+            opacity: 0;
+            transition: opacity 0.9s ease-out 0.3s;
+        }
+    
+        .website-content.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        /* 心跳动画优化 */
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* 摇晃动画优化 */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        .shake {
+            animation: shake 0.5s ease;
+        }
+        
+        /* 歌词显示框样式优化 */
+        .lyrics-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 600px;
             height: 200px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            overflow: hidden;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            display: none;
+        }
+        
+        .lyrics-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .lyrics-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+        
+        .close-lyrics {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 20px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
-
-        .gift-box img:hover {
-            transform: scale(1.1);
+        
+        .close-lyrics:hover {
+            color: #ffd700;
+            transform: scale(1.2);
         }
-
-        .gift-box p {
-            color: white;
-            margin-top: 20px;
-            font-size: 18px;
+        
+        .lyrics-content {
+            height: 130px;
+            overflow-y: auto;
+            padding-right: 10px;
+            text-align: center;
+            font-size: 16px;
+            line-height: 1.8;
         }
-
-        /* 烟花特效 - 优化后的样式 */
-        .firework {
-            position: absolute;
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.8);
-            animation: firework-animation 3s ease-out forwards;
-            z-index: 100;
-        }
-
-        @keyframes firework-animation {
-            0% { transform: translate(0, 0); opacity: 1; }
-            100% { transform: translate(var(--tx), var(--ty)); opacity: 0; }
-        }
-
-        .gold-particle {
-            position: absolute;
+        
+        .lyrics-content::-webkit-scrollbar {
             width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: radial-gradient(circle, #FFD700 0%, #FFA500 100%);
-            box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.7);
-            animation: firework-animation 3s ease-out forwards;
-            z-index: 100;
+        }
+        
+        .lyrics-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .lyrics-content::-webkit-scrollbar-thumb {
+            background: rgba(255, 215, 0, 0.5);
+            border-radius: 10px;
+        }
+        
+        .lyrics-line {
+            margin: 8px 0;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+        }
+        
+        .lyrics-line.active {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 18px;
+            opacity: 1;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+        
+        /* 进度条样式优化 */
+        .progress-container {
+            width: 100%;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #ff8a00, #ff0080);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+        
+        /* 烟花容器样式 */
+        #fireworks-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+        
+        /* 懒加载图片样式 */
+        .lazy-image {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        
+        .lazy-image.loaded {
+            opacity: 1;
+        }
+        
+        /* 错误提示样式 */
+        .error-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(126, 39, 39, 0.315);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            z-index: 10000;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+        }
+        
+        .error-message.show {
+            transform: translateX(0);
         }
 
-        /* 隐藏音乐播放器 */
-        #birthdaySong {
-            display: none;
+        /* 添加管理面板样式 */
+        .admin-section-container {
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
         }
-    
-    /* 礼物盒覆盖层样式 */
-    .gift-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-color: rgba(255, 255, 255, 0.6);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-        transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    
-    .gift-container {
-        text-align: center;
-    }
-    
-    .gift-image {
-        width: 220px;
-        height: 220px;
-        cursor: pointer;
-        transition: transform 0.4s ease;
-        border-radius: 12px;
-        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
-    }
-    
-    .gift-image:hover {
-        transform: scale(1.1) rotate(3deg);
-    }
-    
-    .click-text {
-        margin-top: 20px;
-        font-size: 20px;
-        color: #333;
-        text-shadow: 0 2px 8px rgba(255,255,255,0.9);
-    }
-    
-    .gift-overlay.hidden {
-        opacity: 0;
-        visibility: hidden;
-    }
-    
-    /* 网站内容样式 */
-    .website-content {
-        opacity: 0;
-        transition: opacity 0.9s ease-out 0.3s;
-    }
-    
-    .website-content.visible {
-        opacity: 1;
-    }
-    
-</style>
+        
+        .close-admin-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #ffd700;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 10;
+        }
+        
+        .section-title {
+            display: flex;
+            align-items: center;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: #ffd700;
+        }
+        
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ff8a00 0%, #ff0080 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+        }
+        
+       /* 管理面板样式 */
+        .admin-panel {
+            background: rgba(30, 30, 60, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .admin-title {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #ffd700;
+        }
+        
+        .password-input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffd700;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .wish-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+        }
+        
+        .wish-content {
+            flex: 1;
+        }
+        
+        .wish-author {
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+        
+        .admin-controls {
+            margin-left: 15px;
+        }
+    </style>
 </head>
 <body class="min-h-screen">
+    <!-- 页面加载进度条 -->
+    <div id="loading-bar"></div>
 
-    <!-- 初始覆盖层 -->
+     <!-- 弹幕容器 -->
+    <div id="danmuContainer" class="danmu-container">
+    <div id="danmuWrapper" class="danmu-wrapper"></div>
+    </div>
+    
+    <!-- 错误提示 -->
+    <div id="errorMessage" class="error-message"></div>
+
+    <!-- 初始覆盖层 - 礼物盒入口 -->
     <div id="giftOverlay" class="gift-overlay">
         <div class="gift-container">
             <img src="https://img.jianbihua.com/sites/default/files/styles/photo640x425/public/images/2018-11/20181121152750_618778.jpg" 
-                 alt="生日礼物盒" class="gift-image">
-            <p class="click-text">点击礼盒开启</p>
+            alt="生日礼物盒" class="gift-image lazy-image" id="giftImage">
+            <p class="click-text" id="clickText">点击礼盒开启</p>
         </div>
     </div>
     
+    <!-- 网站主要内容容器 -->
     <div class="website-content">
-<div class="blob w-96 h-96 top-0 left-0"></div>
-    <div class="blob w-80 h-80 bottom-0 right-0"></div>
+        <!-- 背景斑点元素 -->
+        <div class="blob w-96 h-96 top-0 left-0"></div>
+        <div class="blob w-80 h-80 bottom-0 right-0"></div>
 
-    <!-- 礼物盒开场 -->
-    <div class="gift-box" id="giftBox">
-        <img src="https://img.jianbihua.com/sites/default/files/styles/photo640x425/public/images/2018-11/20181121152750_618778.jpg" alt="生日礼物盒" id="giftImage" style="width:200px;height:200px;object-fit:cover;">
-        <p>点击礼物盒开启冯子晨生日应援</p>
-    </div>
-
-    <!-- 弹幕容器 -->
-    <div class="danmu-container" id="danmuContainer"></div>
-
-    <!-- 导航条 -->
-    <nav class="glassmorphism sticky relative top-0 z-50 p-4 mb-8" id="mainNav">
-        <div class="container mx-auto flex items-center justify-between">
-            <div class="text-xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 text-transparent bg-clip-text">
-                <i class="fas fa-birthday-cake mr-2"></i>冯子晨生日应援
-            </div>
-            <div class="hidden md:flex space-x-6">
-                <a href="#countdown" class="text-gray-600 hover:text-blue-600 transition-colors">生日倒计时</a>
-                <a href="#songs" class="text-gray-600 hover:text-blue-600 transition-colors">热门歌曲</a>
-                <a href="#timeline" class="text-gray-600 hover:text-blue-600 transition-colors">歌手历程</a>
-            </div>
-            <button class="md:hidden text-gray-600 focus:outline-none" id="mobileMenuButton" aria-label="导航菜单">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-    
-    <div id="mobileMenu" class="hidden md:hidden absolute top-16 left-0 right-0 bg-white shadow-lg p-4 z-50">
-        <a href="#countdown" class="block py-2 text-gray-600 hover:text-blue-600">生日倒计时</a>
-        <a href="#songs" class="block py-2 text-gray-600 hover:text-blue-600">热门歌曲</a>
-        <a href="#timeline" class="block py-2 text-gray-600 hover:text-blue-600">歌手历程</a>
-    </div>
-    
-</nav>
-
-    <!-- 头部横幅 -->
-    <header class="container mx-auto py-16 px-4 md:px-8 relative text-center">
-        <h1 class="text-4xl md:text-5xl font-bold mb-6">
-            冯子晨 <span class="highlight-text">生日应援</span>
-        </h1>
-        <p class="text-xl md:text-2xl text-gray-600 mb-8">10月8日，让我们一起为TA送上最真挚的祝福</p>
-        <img src="https://s.coze.cn/image/idVtx0e5W30/" alt="冯子晨卡通形象" class="mx-auto rounded-full w-48 h-48 object-cover border-4 border-blue-500 shadow-lg">
-    </header>
-
-    <!-- 生日倒计时部分 -->
-    <section id="countdown" class="container mx-auto py-12 px-4 md:px-8">
-        <div class="glassmorphism p-8 mb-16">
-            <h2 class="text-3xl font-bold mb-6 flex items-center">
-                <div class="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-white mr-3">
-                    <i class="fas fa-clock"></i>
+        <!-- 导航条 -->
+        <nav class="glassmorphism sticky top-0 z-50 p-4 mb-8" id="mainNav">
+            <div class="container mx-auto flex items-center justify-between">
+                <!-- 网站标题 -->
+                <div class="text-xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 text-transparent bg-clip-text">
+                    <i class="fas fa-birthday-cake mr-2"></i>冯子晨的网站
                 </div>
-                生日倒计时
-            </h2>
-            <div class="text-center">
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                    <div class="stat-card glassmorphism p-4 text-center">
-                        <div class="text-sm text-gray-500">天</div>
-                        <div class="text-3xl font-bold text-blue-600" id="days">00</div>
-                    </div>
-                    <div class="stat-card glassmorphism p-4 text-center">
-                        <div class="text-sm text-gray-500">时</div>
-                        <div class="text-3xl font-bold text-blue-600" id="hours">00</div>
-                    </div>
-                    <div class="stat-card glassmorphism p-4 text-center">
-                        <div class="text-sm text-gray-500">分</div>
-                        <div class="text-3xl font-bold text-blue-600" id="minutes">00</div>
-                    </div>
-                    <div class="stat-card glassmorphism p-4 text-center">
-                        <div class="text-sm text-gray-500">秒</div>
-                        <div class="text-3xl font-bold text-blue-600" id="seconds">00</div>
-                    </div>
-                </div>
-                <p class="text-gray-600 mb-4">距离冯子晨生日还有 <span id="countdownText" class="font-bold text-blue-600">...</span></p>
-                <div id="birthdayMessage" class="hidden">
-                    <p class="text-xl font-bold text-blue-600 mb-4">生日快乐！</p>
-                    <audio id="birthdaySong" controls class="mx-auto">
-                        <source src="https://qp139.bmwan.cn/sqrcode/audio?short=iAxPij&domain=fm.bmwwx.cn&sign=" type="audio/mpeg">
-                        您的浏览器不支持音频元素。
-                    </audio><script>
 
-    // 礼盒点击交互
-    document.addEventListener('DOMContentLoaded', function() {
-        const overlay = document.getElementById('giftOverlay');
-        const giftImage = document.querySelector('.gift-image');
-        const websiteContent = document.querySelector('.website-content');
-        
-        giftImage.addEventListener('click', function() {
-            // 隐藏覆盖层
-            overlay.classList.add('hidden');
-            
-            // 显示网站内容
-            setTimeout(() => {
-                websiteContent.classList.add('visible');
-            }, 400);
-        });
-    });
-    
-        document.getElementById("birthdaySong").addEventListener("error", function() {
-            console.error("音频加载失败，请检查链接是否有效");
-            alert("音频加载失败，可能链接已过期或无效");
-        });
-    </script>
+                <!-- 桌面导航菜单 -->
+                <div class="hidden md:flex space-x-6">
+                    <a href="#countdown" class="desktop-nav-link">生日倒计时</a>
+                    <a href="#wishes" class="desktop-nav-link">祝福墙</a>
+                    <a href="#songs" class="desktop-nav-link">热门歌曲</a>
+                    <a href="#timeline" class="desktop-nav-link">歌手历程</a>
+                    <a href="#admin" class="desktop-nav-link">管理</a>
                 </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- 弹幕祝福部分 -->
-    <section class="container mx-auto py-12 px-4 md:px-8">
-        <div class="glassmorphism p-8 mb-16">
-            <h2 class="text-3xl font-bold mb-6 flex items-center">
-                <div class="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-white mr-3">
-                    <i class="fas fa-comment-dots"></i>
-                </div>
-                发送祝福弹幕
-            </h2>
-            <div class="flex flex-col md:flex-row gap-4">
-                <input type="text" id="usernameInput" placeholder="请输入您的昵称" class="flex-grow p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <input type="text" id="danmuInput" placeholder="写下你的祝福..." class="flex-grow p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <button id="sendDanmu" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors">
-                    <i class="fas fa-paper-plane mr-2"></i>发送
+                <!-- 移动端菜单按钮 -->
+                <button class="md:hidden text-gray-300 focus:outline-none" id="mobileMenuButton" aria-label="导航菜单">
+                    <i class="fas fa-bars"></i>
                 </button>
             </div>
-            <p class="text-sm text-gray-500 mt-2">你的祝福将会在屏幕上飘过，让更多人看到！</p>
-        </div>
-    </section>
-
-    <!-- 热门歌曲部分 -->
-    <section id="songs" class="container mx-auto py-12 px-4 md:px-8">
-        <h2 class="text-3xl font-bold mb-12 text-center">热门歌曲</h2>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div class="glassmorphism p-6 card-hover">
-                <img src="https://s.coze.cn/image/H4PZnp6hSXw/" alt="星光" class="w-full h-48 object-cover rounded-lg mb-4">
-                <h3 class="text-xl font-semibold mb-2">星光</h3>
-                <p class="text-gray-600 mb-4">冯子晨首张个人专辑主打歌</p>
-                
+            
+            <!-- 移动端菜单 -->
+            <div id="mobileMenu" class="hidden md:hidden absolute top-full left-0 right-0 glassmorphism shadow-lg p-4 z-50">
+                <a href="#countdown" class="mobile-nav-link block py-2">生日倒计时</a>
+                <a href="#wishes" class="mobile-nav-link block py-2">祝福墙</a>
+                <a href="#songs" class="mobile-nav-link block py-2">热门歌曲</a>
+                <a href="#timeline" class="mobile-nav-link block py-2">歌手历程</a>
+                <a href="#admin" class="mobile-nav-link block py-2">管理</a>
             </div>
+        </nav>
 
-            <div class="glassmorphism p-6 card-hover">
-                <img src="https://s.coze.cn/image/jCw00Qc3qm0/" alt="追梦人" class="w-full h-48 object-cover rounded-lg mb-4">
-                <h3 class="text-xl font-semibold mb-2">追梦人</h3>
-                <p class="text-gray-600 mb-4">励志单曲，鼓舞无数听众</p>
-                
+        <!-- 头部横幅 -->
+        <header class="container mx-auto py-16 px-4 md:px-8 relative text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6">
+                <span class="highlight-text">冯子晨生日应援</span>
+            </h1>
+            <p class="text-xl md:text-2xl text-gray-300 mb-8">让我们一起为TA送上最好玩的祝福</p>
+            <img src="https://p1.music.126.net/v43o97-fG8V6lF7MG2RB_Q==/109951172008963780.jpg?param=180y180" 
+            alt="冯子晨卡通形象" class="mx-auto rounded-full w-48 h-48 object-cover border-4 border-yellow-500 shadow-lg shadow-yellow-500/30 lazy-image">
+        </header>
+
+        <!-- 生日倒计时部分 -->
+        <section id="countdown" class="container mx-auto py-12 px-4 md:px-8">
+            <div class="glassmorphism p-8 mb-16">
+                <h2 class="text-3xl font-bold mb-6 flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 flex items-center justify-center text-white mr-3">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    生日倒计时
+                </h2>
+                <div class="text-center">
+                    <!-- 倒计时卡片 -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                        <div class="stat-card glassmorphism p-4 text-center">
+                            <div class="text-sm text-gray-400">天</div>
+                            <div class="text-3xl font-bold text-yellow-400" id="days">00</div>
+                        </div>
+                        <div class="stat-card glassmorphism p-4 text-center">
+                            <div class="text-sm text-gray-400">时</div>
+                            <div class="text-3xl font-bold text-yellow-400" id="hours">00</div>
+                        </div>
+                        <div class="stat-card glassmorphism p-4 text-center">
+                            <div class="text-sm text-gray-400">分</div>
+                            <div class="text-3xl font-bold text-yellow-400" id="minutes">00</div>
+                        </div>
+                        <div class="stat-card glassmorphism p-4 text-center">
+                            <div class="text-sm text-gray-400">秒</div>
+                            <div class="text-3xl font-bold text-yellow-400" id="seconds">00</div>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 mb-4">距离冯子晨生日还有 <span id="countdownText" class="font-bold text-yellow-400">...</span></p>
+                    <!-- 生日祝福区域 -->
+                    <div id="birthdayMessage" class="hidden">
+                        <p class="text-xl font-bold text-yellow-400 mb-4">生日快乐！</p>
+                        <audio id="birthdaySong" class="mx-auto">
+                            <source src="https://dlink.host/musics/aHR0cHM6Ly9vbmVkcnYtbXkuc2hhcmVwb2ludC5jb20vOnU6L2cvcGVyc29uYWwvc3Rvcl9vbmVkcnZfb25taWNyb3NvZnRfY29tL0VjX2kzSlFLMnR4Rm55Q3NIeG0tZVJBQlRIZkNyN0xNLWs4WjkxOWR2OS1QWFE.wav" type="audio/mpeg">
+                            您的浏览器不支持音频元素。
+                        </audio>
+                        <button id="playButton" class="play-button mt-4">
+                            <i class="fas fa-play mr-2"></i>播放生日歌
+                        </button>
+                    </div>
+                </div>
             </div>
+        </section>
 
-            <div class="glassmorphism p-6 card-hover">
-                <img src="https://s.coze.cn/image/MHpplF5IKeQ/" alt="遇见你" class="w-full h-48 object-cover rounded-lg mb-4">
-                <h3 class="text-xl font-semibold mb-2">遇见你</h3>
-                <p class="text-gray-600 mb-4">甜蜜情歌，广受粉丝喜爱</p>
+        <!-- 祝福墙部分（整合弹幕功能） -->
+        <section id="wishes" class="container mx-auto py-12 px-4 md:px-8">
+            <div class="glassmorphism p-8 mb-16">
+                <h2 class="text-3xl font-bold mb-6 flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 flex items-center justify-center text-white mr-3">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    祝福墙
+                </h2>
                 
-            </div>
-        </div>
-    </section>
+                <!-- 祝福表单（整合弹幕功能） -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-semibold mb-4">留下你的祝福</h3>
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <input type="text" id="wishName" placeholder="你的名字" class="flex-grow p-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                        <textarea id="wishMessage" placeholder="写下你的祝福..." class="flex-grow p-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500" rows="1"></textarea>
+                        <button id="submitWish" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-lg transition-colors">
+                            <i class="fas fa-paper-plane mr-2"></i>发送祝福
+                        </button>
+                    </div>
+                    <p class="text-sm text-gray-400 mt-2">你的祝福将会在屏幕上飘过，让更多人看到！</p>
+                </div>
+                
+                <!-- 祝福展示区域 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="wishContainer">
+                    <!-- 初始祝福卡片将通过JS动态添加 -->
+                </div>
 
-    <!-- 歌手历程时间线部分 -->
-    <section id="timeline" class="container mx-auto py-12 px-4 md:px-8">
-        <div class="glassmorphism p-8">
+                <!-- 查看更多按钮 -->
+                <div class="text-center mt-6">
+                    <button id="viewMoreBtn" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-6 rounded-lg transition-colors">
+                        <i class="fas fa-chevron-down mr-2"></i>查看更多祝福
+                    </button>
+                </div>
+
+                <!-- 折叠的祝福区域 -->
+                <div id="collapsedWishes" class="hidden mt-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="moreWishContainer">
+                        <!-- 更多祝福卡片将通过JS动态添加 -->
+                    </div>
+                    <div class="text-center mt-6">
+                        <button id="viewLessBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-6 rounded-lg transition-colors">
+                            <i class="fas fa-chevron-up mr-2"></i>收起祝福
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 热门歌曲部分 - 卡片等比例缩小 --> 
+        <section id="songs" class="container mx-auto py-12 px-4 md:px-8">
+            <h2 class="text-3xl font-bold mb-12 text-center">热门歌曲</h2>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- 歌曲卡片1 -->
+                    <a href="https://music.163.com/#/song?id=1965555401" target="_blank" class="block">
+                        <div class="glassmorphism p-5 card-hover card-scale">
+                            <div class="aspect-w-1 aspect-h-1 mb-3">
+                                <img src="https://p1.music.126.net/TknzVmdHRrO9Bi-PdZ0lOA==/109951167695821797.jpg?param=130y130/" alt="半山腰" class="w-full h-full object-cover rounded-lg lazy-image">
+                            </div>
+                            <h3 class="text-lg font-semibold mb-1">半山腰</h3>
+                            <p class="text-sm text-gray-400">发行时间：2022-07-22</p>
+                        </div>
+                    </a>
+
+                <!-- 歌曲卡片2 -->
+                <a href="https://music.163.com/#/song?id=1406642934" target="_blank" class="block">
+                        <div class="glassmorphism p-5 card-hover card-scale">
+                            <div class="aspect-w-1 aspect-h-1 mb-3">
+                                <img src="https://p2.music.126.net/A4uSU0kJZT0xpw-S0fGg2Q==/109951164539421824.jpg?param=130y130" alt="我要找到你" class="w-full h-full object-cover rounded-lg lazy-image">
+                            </div>
+                            <h3 class="text-lg font-semibold mb-1">我要找到你</h3>
+                            <p class="text-sm text-gray-400">发行时间：2019-12-09</p>
+                        </div>
+                    </a>
+
+                <!-- 歌曲卡片3 -->
+                <a href="https://music.163.com/#/song?id=1999622522" target="_blank" class="block">
+                        <div class="glassmorphism p-5 card-hover card-scale">
+                            <div class="aspect-w-1 aspect-h-1 mb-3">
+                                <img src="https://p1.music.126.net/jzPCcoEVJVL4KIF9-YZzzw==/109951168141717833.jpg?param=130y130" alt="孤寂百年" class="w-full h-full object-cover rounded-lg lazy-image">
+                            </div>
+                            <h3 class="text-lg font-semibold mb-1">孤寂百年</h3>
+                            <p class="text-sm text-gray-400">发行时间：2022-12-13</p>
+                        </div>
+                    </a>
+                
+                <!-- 歌曲卡片4 -->
+                <a href="https://music.163.com/#/song?id=1985709585" target="_blank" class="block">
+                        <div class="glassmorphism p-5 card-hover card-scale">
+                            <div class="aspect-w-1 aspect-h-1 mb-3">
+                                <img src="https://p2.music.126.net/bSnqB67UiLEOE6tchIo1oA==/109951167920720461.jpg?param=130y130" alt="虚无" class="w-full h-full object-cover rounded-lg lazy-image">
+                            </div>
+                            <h3 class="text-lg font-semibold mb-1">虚无</h3>
+                            <p class="text-sm text-gray-400">发行时间：2022-10-07</p>
+                        </div>
+                    </a>
+                
+                <!-- 歌曲卡片5 -->
+                <a href="https://music.163.com/#/song?id=2141893618" target="_blank" class="block">
+                        <div class="glassmorphism p-5 card-hover card-scale">
+                            <div class="aspect-w-1 aspect-h-1 mb-3">
+                                <img src="https://p1.music.126.net/oj_wHkaesyR-myAOCGeUUg==/109951169463958461.jpg?param=130y130" alt="众山小" class="w-full h-full object-cover rounded-lg lazy-image">
+                            </div>
+                            <h3 class="text-lg font-semibold mb-1">众山小</h3>
+                            <p class="text-sm text-gray-400">发行时间：2024-04-12</p>
+                        </div>
+                    </a>
+                
+                <!-- 歌曲卡片6 -->
+                <a href="https://music.163.com/#/song?id=2095568080" target="_blank" class="block">
+                        <div class="glassmorphism p-5 card-hover card-scale">
+                            <div class="aspect-w-1 aspect-h-1 mb-3">
+                                <img src="https://p2.music.126.net/b0CiyFllBnis0DHqnr_7Bw==/109951169022200954.jpg?param=130y130" alt="弯弯" class="w-full h-full object-cover rounded-lg lazy-image">
+                            </div>
+                            <h3 class="text-lg font-semibold mb-1">弯弯</h3>
+                            <p class="text-sm text-gray-400">发行时间：2023-10-31</p>
+                        </div>
+                    </a>
+            </div>
+        </section>
+
+        <!-- 歌手历程时间线部分 -->
+        <section id="timeline" class="container mx-auto py-12 px-4 md:px-8">
+            <div class="glassmorphism p-8">
+                <h2 class="text-3xl font-bold mb-6 flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 flex items-center justify-center text-white mr-3">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    歌手历程
+                </h2>
+
+                <div class="relative">
+                    <!-- 时间线 -->
+                    <div class="timeline-line absolute left-6 top-0 bottom-0"></div>
+
+                    <!-- 时间线项目 -->
+                    <div class="relative pl-16 pb-8">
+                        <div class="timeline-dot absolute left-5 top-9"></div>
+                        <div class="glassmorphism p-4 rounded-lg">
+                            <h3 class="text-xl font-semibold text-yellow-400">2018年</h3>
+                            <p class="text-gray-400">参加《明日之星》选秀节目，获得全国总冠军</p>
+                        </div>
+                    </div>
+
+                    <div class="relative pl-16 pb-8">
+                        <div class="timeline-dot absolute left-5 top-9"></div>
+                        <div class="glassmorphism p-4 rounded-lg">
+                            <h3 class="text-xl font-semibold text-yellow-400">2019年</h3>
+                            <p class="text-gray-400">发行首张个人EP《初光》，销量突破百万</p>
+                        </div>
+                    </div>
+
+                    <div class="relative pl-16 pb-8">
+                        <div class="timeline-dot absolute left-5 top-9"></div>
+                        <div class="glassmorphism p-4 rounded-lg">
+                            <h3 class="text-xl font-semibold text-yellow-400">2020年</h3>
+                            <p class="text-gray-400">举办首次个人巡回演唱会"星光之旅"</p>
+                        </div>
+                    </div>
+
+                    <div class="relative pl-16 pb-8">
+                        <div class="timeline-dot absolute left-5 top-9"></div>
+                        <div class="glassmorphism p-4 rounded-lg">
+                            <h3 class="text-xl font-semibold text-yellow-400">2021年</h3>
+                            <p class="text-gray-400">获得年度最佳流行歌手奖</p>
+                        </div>
+                    </div>
+
+                    <div class="relative pl-16">
+                        <div class="timeline-dot absolute left-5 top-9"></div>
+                        <div class="glassmorphism p-4 rounded-lg">
+                            <h3 class="text-xl font-semibold text-yellow-400">2022年</h3>
+                            <p class="text-gray-400">发行第二张专辑《追梦人》，全球销量突破500万</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 修改管理面板HTML结构 -->
+        <section id="admin" class="glassmorphism p-8 hidden">
+        <div class="admin-section-container">
+            <!-- 关闭按钮 -->
+            <button id="close-admin-btn" class="close-admin-btn">
+            <i class="fas fa-times"></i>
+            </button>
+            
             <h2 class="text-3xl font-bold mb-6 flex items-center">
-                <div class="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-white mr-3">
-                    <i class="fas fa-history"></i>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 flex items-center justify-center text-white mr-3">
+                    <i class="fas fa-lock"></i>
                 </div>
-                歌手历程
+                弹幕管理
             </h2>
+            
+            <div class="admin-panel">
+                <div class="mb-4">
+                    <h3 class="text-lg font-semibold mb-2">弹幕同步状态</h3>
+                    <p id="syncStatus">正在连接公共弹幕库...</p>
+                </div>
+                <button id="refreshDanmu" class="btn-primary">
+                        <i class="fas fa-sync mr-2"></i>手动刷新弹幕
+                    </button>
+            </div>
 
-            <div class="relative">
-                <!-- 时间线 -->
-                <div class="timeline-line absolute left-6 top-0 bottom-0"></div>
-
-                <!-- 时间线项目 -->
-                <div class="relative pl-16 pb-8">
-                    <div class="timeline-dot absolute left-6 top-2"></div>
-                    <div class="bg-white p-4 rounded-lg shadow">
-                        <h3 class="text-xl font-semibold text-blue-600">2018年</h3>
-                        <p class="text-gray-600">参加《明日之星》选秀节目，获得全国总冠军</p>
-                    </div>
+            <div class="admin-section">
+            <h2 class="section-title">
+                <div class="section-icon">
+                <i class="fas fa-lock"></i>
+                </div>
+                祝福墙管理
+            </h2>
+            
+            <div class="admin-panel glassmorphism">
+                <div id="login-form">
+                <h3 class="admin-title">管理员登录</h3>
+                <input type="password" id="admin-password" class="password-input" placeholder="输入管理员密码">
+                <div class="flex gap-2 mt-4">
+                    <button id="login-btn" class="btn-primary flex-1">登录</button>
+                    <button id="cancel-btn" class="btn-secondary flex-1">取消</button>
+                </div>
+                </div>
+                
+                <div id="admin-content" class="hidden">
+                <div class="admin-header">
+                    <h3 class="admin-title">管理面板</h3>
+                    <button id="logout-btn" class="logout-btn">
+                    <i class="fas fa-sign-out-alt mr-2"></i>退出登录
+                    </button>
                 </div>
 
-                <div class="relative pl-16 pb-8">
-                    <div class="timeline-dot absolute left-6 top-2"></div>
-                    <div class="bg-white p-4 rounded-lg shadow">
-                        <h3 class="text-xl font-semibold text-blue-600">2019年</h3>
-                        <p class="text-gray-600">发行首张个人EP《初光》，销量突破百万</p>
+                 <div>
+                    <h3 class="text-lg font-semibold mb-2">弹幕设置</h3>
+                    <div class="flex items-center mb-2">
+                        <input type="checkbox" id="autoSync" class="mr-2" checked>
+                        <label for="autoSync">自动同步弹幕（每30秒）</label>
+                    </div>
+                    
+                    <button id="clearLocal" class="btn-danger ml-2">
+                        <i class="fas fa-trash-alt mr-2"></i>清空本地数据
+                    </button>
+                </div>
+                
+                <div id="wish-list" class="mt-6">
+                    <h3 class="text-xl font-semibold mb-4 text-center text-yellow-300">所有祝福</h3>
+                    <button id="clear-all-btn" class="btn-danger">
+                        <i class="fas fa-trash-alt mr-2"></i>清空所有祝福
+                    </button>
+                    <div id="admin-wish-container">
+                    <!-- 管理模式的祝福列表 -->
+                    </div>
+                    <div class="mt-4 text-center">
+                    
                     </div>
                 </div>
-
-                <div class="relative pl-16 pb-8">
-                    <div class="timeline-dot absolute left-6 top-2"></div>
-                    <div class="bg-white p-4 rounded-lg shadow">
-                        <h3 class="text-xl font-semibold text-blue-600">2020年</h3>
-                        <p class="text-gray-600">举办首次个人巡回演唱会"星光之旅"</p>
-                    </div>
-                </div>
-
-                <div class="relative pl-16 pb-8">
-                    <div class="timeline-dot absolute left-6 top-2"></div>
-                    <div class="bg-white p-4 rounded-lg shadow">
-                        <h3 class="text-xl font-semibold text-blue-600">2021年</h3>
-                        <p class="text-gray-600">获得年度最佳流行歌手奖</p>
-                    </div>
-                </div>
-
-                <div class="relative pl-16">
-                    <div class="timeline-dot absolute left-6 top-2"></div>
-                    <div class="bg-white p-4 rounded-lg shadow">
-                        <h3 class="text-xl font-semibold text-blue-600">2022年</h3>
-                        <p class="text-gray-600">发行第二张专辑《追梦人》，全球销量突破500万</p>
-                    </div>
                 </div>
             </div>
+            </div>
         </div>
-    </section>
+        </section>
 
-    <!-- 页脚 -->
-    <footer class="bg-blue-900 text-white py-8 mt-12">
-        <div class="container mx-auto px-4 text-center">
-            <p>© 2023 冯子晨生日应援网站</p>
-            <p class="mt-2 text-blue-200">created by <a href="https://space.coze.cn" class="underline hover:text-white">coze space</a></p>
-            <p class="text-sm text-blue-300 mt-2">页面内容均由 AI 生成，仅供参考</p>
+
+        <!-- 页脚 -->
+        <footer class="bg-blue-900 text-white py-8 mt-12">
+            <div class="container mx-auto px-4 text-center">
+                <p>© 2025 冯子晨生日应援网站</p>
+                <p class="mt-2 text-blue-200">created by kkchan</a></p>
+                <p class="text-sm text-blue-300 mt-2">页面内容版权归制作方所有，请勿侵权</p>
+            </div>
+        </footer>
+    </div> <!-- 网站内容结束 -->
+    
+    <!-- 特效容器 -->
+    <div id="effects-container"></div>
+    
+    <!-- 3D烟花容器 -->
+    <div id="fireworks-container"></div>
+    
+    <!-- 弹幕容器 -->
+    <div id="danmuContainer" class="danmu-container"></div>
+    
+    <!-- 歌词显示框 -->
+    <div id="lyricsContainer" class="lyrics-container">
+        <div class="lyrics-header">
+            <div class="lyrics-title">生日歌歌词</div>
+            <button id="closeLyrics" class="close-lyrics">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
-    </footer>
+        <div class="lyrics-content" id="lyricsContent">
+            <!-- 歌词将通过JavaScript动态填充 -->
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+    </div>
 
     <script>
+        // LeanCloud配置
+        const LEANCLOUD_APP_ID = "4D5Hd1oQNlltpT2wvycon1SP-gzGzoHsz";
+        const LEANCLOUD_APP_KEY = "LnP5R2NYl8QyU9OTkBgQhpbt";
+        const LEANCLOUD_SERVER_URL = "https://4d5hd1oq.lc-cn-n1-shared.com"; // 国内节点
+            
+        // 添加管理员密码常量
+        const DANMU_KEY = 'fengzichen_danmu_data';
+        const ADMIN_PASSWORD = "admin123";
+        let globalDanmus = []; // 全局弹幕数组
 
-    // 礼盒点击交互
-    document.addEventListener('DOMContentLoaded', function() {
-        const overlay = document.getElementById('giftOverlay');
-        const giftImage = document.querySelector('.gift-image');
-        const websiteContent = document.querySelector('.website-content');
+        // 获取管理面板相关元素
+        const adminSection = document.getElementById('admin');
+        const closeAdminBtn = document.getElementById('close-admin-btn');
+        const loginForm = document.getElementById('login-form');
+        const adminContent = document.getElementById('admin-content');
+        const adminPassword = document.getElementById('admin-password');
+        const loginBtn = document.getElementById('login-btn');
+        const cancelBtn = document.getElementById('cancel-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const clearAllBtn = document.getElementById('clear-all-btn');
+        const adminWishContainer = document.getElementById('admin-wish-container');
+        // 在全局变量区域添加
+        let allWishes = [];
+        let isExpanded = false;
+        const MAX_INITIAL_WISHES = 9;
+
+
+        // 初始化LeanCloud
+        AV.init({
+            appId: LEANCLOUD_APP_ID,
+            appKey: LEANCLOUD_APP_KEY,
+            serverURL: LEANCLOUD_SERVER_URL
+        });
+
+        // 验证LeanCloud配置
+        function validateLeanCloudConfig() {
+                if (!LEANCLOUD_APP_ID || LEANCLOUD_APP_ID === "您的LeanCloud应用ID") {
+                    showError('LeanCloud应用ID未配置');
+                    return false;
+                }
+                
+                if (!LEANCLOUD_APP_KEY || LEANCLOUD_APP_KEY === "您的LeanCloud应用Key") {
+                    showError('LeanCloud应用Key未配置');
+                    return false;
+                }
+                
+                if (!LEANCLOUD_SERVER_URL || LEANCLOUD_SERVER_URL.includes("您的域名")) {
+                    showError('LeanCloud服务器地址未配置');
+                    return false;
+                }
+                
+                return true;
+        }   
+
+        // 网络状态检测
+        function checkNetworkStatus() {
+            if (!navigator.onLine) {
+                showError('网络连接不可用，部分功能受限');
+                return false;
+            }
+            return true;
+        }
+
         
-        giftImage.addEventListener('click', function() {
-            // 隐藏覆盖层
-            overlay.classList.add('hidden');
-            
-            // 显示网站内容
-            setTimeout(() => {
-                websiteContent.classList.add('visible');
-            }, 400);
-        });
-    });
-    
-        // 礼物盒点击事件
-        document.getElementById('giftImage').addEventListener('click', function() {
-            document.getElementById('giftBox').classList.add('hidden');
-        });
+        // 全局变量存储音频元素
+        let birthdayAudio = null;
+        let audioInitialized = false;
+        let lyricsVisible = false;
+        let danmuInterval;
+        let fireworksStarted = false; // 烟花是否已启动
 
-        // 生日倒计时
-        function updateCountdown() {
-            const now = new Date();
-            const targetDate = new Date(now.getFullYear(), 9, 8); // 10月8日 (月份从0开始)
-            
-            // 如果今年生日已过，计算明年生日
-            if (now > targetDate) {
-                targetDate.setFullYear(targetDate.getFullYear() + 1);
+        // // 示例弹幕数据
+        const sampleDanmus = [
+            {username: "王哈哈", text: "冯子晨生日快乐！"},
+            {username: "去去", text: "永远支持你！"},
+            {username: "萌萌", text: "新专辑大卖！"},
+            {username: "凉酒", text: "期待你的演唱会！"},
+            {username: "小老李", text: "你是最棒的！"},
+            {username: "kkchan", text: "生日快乐，爱你！"},
+            {username: "梦梦", text: "祝事业蒸蒸日上！"},
+            {username: "haha", text: "期待更多好作品！"}
+        ];
+        
+        // 增强错误处理函数
+        function showError(message) {
+            // 确保错误元素存在
+            let errorEl = document.getElementById('errorMessage');
+            if (!errorEl) {
+                errorEl = document.createElement('div');
+                errorEl.id = 'errorMessage';
+                errorEl.className = 'error-message';
+                document.body.appendChild(errorEl);
             }
             
-            const diff = targetDate - now;
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
             
+            setTimeout(() => {
+                errorEl.classList.remove('show');
+            }, 20000);
+        }
+        
+         /// 获取本地弹幕数据
+        function getLocalDanmus() {
+            const localData = localStorage.getItem(DANMU_KEY);
+            const danmus = localData ? JSON.parse(localData) : [];
+            
+            // 添加调试信息
+            console.log('本地弹幕数据:', danmus);
+            
+            // 确保每个弹幕对象都有必要的属性
+            return danmus.map(danmu => {
+                return {
+                    id: danmu.id || Date.now(),
+                    username: danmu.username || '匿名用户',
+                    text: danmu.text || '未知祝福',
+                    timestamp: danmu.timestamp || new Date().toISOString(),
+                    objectId: danmu.objectId || null
+                };
+            });
+        }
+        
+        // 保存弹幕到本地
+        function saveDanmuToLocal(username, text, objectId = null) {
+            const danmus = getLocalDanmus();
+            const identifier = `${username}-${text}`;
+            
+            // 检查是否已存在相同弹幕
+            const exists = danmus.some(danmu => 
+                `${danmu.username}-${danmu.text}` === identifier
+            );
+            
+            if (exists) {
+                console.log('弹幕已存在，不重复添加');
+                return null;
+            }
+            
+            const newDanmu = {
+                id: Date.now(),
+                username: username || '匿名用户',
+                text: text || '未知祝福',
+                timestamp: new Date().toISOString(),
+                objectId: objectId
+            };
+            
+            danmus.push(newDanmu);
+            localStorage.setItem(DANMU_KEY, JSON.stringify(danmus));
+            return newDanmu;
+        }
+
+         // 修复点6：增强从云端获取弹幕的函数
+        async function fetchPublicDanmus() {
+            if (!checkNetworkStatus()) {
+                return [];
+            }
+            
+            try {
+                // 创建查询
+                const query = new AV.Query('Danmu');
+                query.descending('createdAt');
+                query.limit(100); // 最多获取100条
+                
+                // 执行查询
+                const results = await query.find();
+                
+                // 转换为普通对象
+                return results.map(result => ({
+                    id: result.id,
+                    username: result.get('username'),
+                    text: result.get('text'),
+                    timestamp: result.get('timestamp').toISOString()
+                }));
+            } catch (error) {
+                console.error('从云端获取弹幕失败:', error);
+                
+                // 详细错误处理
+                let errorMessage = '无法获取公共弹幕，将使用本地弹幕';
+                
+                if (error.message.includes('Failed to fetch')) {
+                    errorMessage = '无法连接到服务器，请检查网络连接';
+                } else if (error.code === 401) {
+                    errorMessage = '应用ID或Key错误，请检查配置';
+                }
+                
+                showError(errorMessage);
+                return [];
+            }
+        }
+
+         // 设置实时监听（新增）
+        function setupRealtimeListener() {
+            const query = new AV.Query('Danmu');
+            query.subscribe().then((subscription) => {
+                subscription.on('create', (danmu) => {
+                    const newDanmu = {
+                        id: danmu.id,
+                        username: danmu.get('username'),
+                        text: danmu.get('text'),
+                        timestamp: danmu.get('timestamp').toISOString()
+                    };
+                    
+                    const danmus = getLocalDanmus();
+                    danmus.push(newDanmu);
+                    localStorage.setItem(DANMU_KEY, JSON.stringify(danmus));
+                    
+                    sendDanmu(newDanmu.username, newDanmu.text);
+                });
+            });
+        }
+        
+        // 发送弹幕函数 - 修改为使用CSS动画
+        function sendDanmu(username, text) {
+            const danmuContainer = document.getElementById('danmuContainer');
+            if (!danmuContainer) return;
+            
+            const danmu = document.createElement('div');
+            danmu.className = 'danmu';
+            danmu.textContent = `${username}：${text}`;
+            
+            // 随机颜色
+            const danmuColors = ['#ffd700', '#ff6b6b', '#4ecdc4', '#ff8a00', '#9b59b6'];
+            danmu.style.color = danmuColors[Math.floor(Math.random() * danmuColors.length)];
+            
+            // 随机高度位置 (10%-90%)
+            const top = Math.random() * 80 + 10;
+            danmu.style.top = `${top}%`;
+            
+            // 随机动画持续时间 (10-20秒)
+            const duration = 10 + Math.random() * 10;
+            danmu.style.animationDuration = `${duration}s`;
+            
+            // 添加到容器
+            danmuContainer.appendChild(danmu);
+            
+            // 动画结束后移除元素（不再保留在DOM中）
+            danmu.addEventListener('animationend', function() {
+                if (danmu.parentNode) {
+                    danmu.parentNode.removeChild(danmu);
+                }
+            });
+        }
+        
+        // 初始化弹幕函数
+        async function initDanmu() {
+            const statusEl = document.getElementById('syncStatus');
+            
+            try {
+                // 每次刷新都重新获取弹幕数据
+                const publicDanmus = await fetchPublicDanmus();
+                const localDanmus = getLocalDanmus();
+                
+                // 合并弹幕并去重
+                const allDanmus = [...publicDanmus, ...localDanmus];
+                const uniqueDanmus = [];
+                const seen = new Set();
+                
+                for (const danmu of allDanmus) {
+                    const identifier = `${danmu.username}-${danmu.text}`;
+                    if (!seen.has(identifier)) {
+                        seen.add(identifier);
+                        uniqueDanmus.push(danmu);
+                    }
+                }
+                
+                // 保存到全局变量
+                globalDanmus = uniqueDanmus;
+                
+                // 开始发送弹幕（所有弹幕只发送一次）
+                startDanmu();
+                
+                if (statusEl) statusEl.textContent = `已加载 ${globalDanmus.length} 条弹幕`;
+                } catch (error) {
+                console.error('初始化弹幕失败:', error);
+                if (statusEl) statusEl.textContent = "弹幕加载失败";
+                showError('弹幕加载失败，使用本地弹幕');
+                
+                // 使用本地弹幕作为后备
+                globalDanmus = getLocalDanmus();
+                startDanmu();
+            }
+        }
+                
+        // 发送弹幕
+        function startDanmu(danmus) {
+            // 清除现有弹幕定时器
+            clearInterval(danmuInterval);
+            
+            // 创建已发送弹幕的追踪器
+            const sentDanmus = new Set();
+            
+            // 发送初始弹幕（确保不重复）
+            for (let i = 0; i < Math.min(10, danmus.length); i++) {
+                const randomIndex = Math.floor(Math.random() * danmus.length);
+                const danmu = danmus[randomIndex];
+                const identifier = `${danmu.username}-${danmu.text}`;
+                
+                if (!sentDanmus.has(identifier)) {
+                    sendDanmu(danmu.username, danmu.text);
+                    sentDanmus.add(identifier);
+                }
+            }
+            
+            // 定时发送弹幕（避免重复）
+            danmuInterval = setInterval(() => {
+                if (danmus.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * danmus.length);
+                    const danmu = danmus[randomIndex];
+                    const identifier = `${danmu.username}-${danmu.text}`;
+                    
+                    // 确保未发送过
+                    if (!sentDanmus.has(identifier)) {
+                        sendDanmu(danmu.username, danmu.text);
+                        sentDanmus.add(identifier);
+                        
+                        // 如果所有弹幕都已发送，重置追踪器
+                        if (sentDanmus.size >= danmus.length) {
+                            sentDanmus.clear();
+                        }
+                    }
+                }
+            }, 3000); // 每3秒发送一条
+        }
+
+        
+        // 添加祝福到祝福墙
+        function addWishToWall(wish, container) {
+            if (!container) {
+                console.error('Container not found');
+                return;
+            }
+            
+            // 确保有必要的属性
+            const username = wish.username || '匿名用户';
+            const text = wish.text || '未知祝福';
+            const timestamp = wish.timestamp ? new Date(wish.timestamp).toLocaleTimeString() : '未知时间';
+            
+            const wishElement = document.createElement('div');
+            wishElement.className = 'wish-card glassmorphism p-4';
+            wishElement.innerHTML = `
+                <h4 class="font-semibold text-yellow-400 wish-author">${username}</h4>
+                <p class="text-sm mt-2">${text}</p>
+                <div class="text-xs text-gray-500 mt-2">${timestamp}</div>
+            `;
+            
+            container.appendChild(wishElement);
+        }
+
+        // 添加折叠/展开功能
+        function setupWishExpansion() {
+            const viewMoreBtn = document.getElementById('viewMoreBtn');
+            const viewLessBtn = document.getElementById('viewLessBtn');
+            const collapsedSection = document.getElementById('collapsedWishes');
+            
+            if (viewMoreBtn && viewLessBtn && collapsedSection) {
+                viewMoreBtn.addEventListener('click', function() {
+                    collapsedSection.classList.remove('hidden');
+                    viewMoreBtn.classList.add('hidden');
+                    viewLessBtn.classList.remove('hidden');
+                    isExpanded = true;
+                });
+                
+                viewLessBtn.addEventListener('click', function() {
+                    collapsedSection.classList.add('hidden');
+                    viewMoreBtn.classList.remove('hidden');
+                    viewLessBtn.classList.add('hidden');
+                    isExpanded = false;
+                    
+                    // 滚动到祝福墙顶部
+                    document.getElementById('wishes').scrollIntoView({ behavior: 'smooth' });
+                });
+            }
+        }
+        
+        // 修复点2：重构submitWish函数
+        async function submitWish() {
+            // 获取输入元素
+            const nameInput = document.getElementById('wishName');
+            const messageInput = document.getElementById('wishMessage');
+            
+            // 获取输入值
+            const username = nameInput.value.trim();
+            const message = messageInput.value.trim();
+            
+            console.log('提交祝福:', {username, message});
+            
+            // 验证输入
+            if (!username) {
+                showError('请输入您的名字');
+                nameInput.focus();
+                return;
+            }
+            
+            if (!message) {
+                showError('请输入祝福内容');
+                messageInput.focus();
+                return;
+            }
+
+            try {
+                // 添加去重检查
+                const identifier = `${username}-${message}`;
+                const existing = globalDanmus.some(danmu => 
+                    `${danmu.username}-${danmu.text}` === identifier
+                );
+                
+                if (existing) {
+                    showError('请勿重复发送相同祝福');
+                    return;
+                }
+                // 添加加载状态
+                const submitButton = document.getElementById('submitWish');
+                if (submitButton) {
+                    submitButton.disabled = true;
+                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>发送中...';
+                }
+                
+                // 保存到本地
+                const newDanmu = saveDanmuToLocal(username, message);
+                console.log('保存到本地的弹幕:', newDanmu);
+
+                 // 添加到全局弹幕数组
+                globalDanmus.push(newDanmu);
+                
+                // 只发送这条新弹幕
+                sendDanmu(username, message);
+                
+                // 尝试保存到云端
+                await saveDanmuToPublic(username, message);
+                
+                // 清空输入框
+                nameInput.value = '';
+                messageInput.value = '';
+                
+                showError('祝福已发送！');
+                
+                // 重新初始化祝福墙以显示新祝福
+                initWishWall();
+            } catch (error) {
+                console.error('提交祝福失败:', error);
+                showError('提交失败，请重试');
+            } finally {
+                // 恢复按钮状态
+                const submitButton = document.getElementById('submitWish');
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>发送祝福';
+                }
+            }
+        }
+        
+        // 保存弹幕到云端
+        async function saveDanmuToPublic(username, text, retryCount = 2) {
+            // 检查网络状态
+            if (!checkNetworkStatus()) {
+                return null;
+            }
+            
+            try {
+                console.log('尝试保存到LeanCloud:', {username, text});
+                
+                // 创建LeanCloud对象
+                const Danmu = AV.Object.extend('Danmu');
+                const danmu = new Danmu();
+                
+                // 设置属性
+                danmu.set('username', username);
+                danmu.set('text', text);
+                danmu.set('timestamp', new Date());
+                
+                // 保存到云端
+                const savedDanmu = await danmu.save();
+                console.log('弹幕保存成功:', savedDanmu);
+                
+                // 返回保存的对象，包含objectId
+                return savedDanmu;
+            } catch (error) {
+                console.error('保存到云端失败:', error);
+                
+                // 详细错误处理
+                let errorMessage = '弹幕保存失败，已保存到本地';
+                
+                if (error.message.includes('Failed to fetch')) {
+                    errorMessage = '无法连接到服务器，请检查网络连接';
+                } else if (error.code === 401) {
+                    errorMessage = '应用ID或Key错误，请检查配置';
+                } else if (error.code === 404) {
+                    errorMessage = '服务器地址错误或服务不可用';
+                } else if (error.code === 500) {
+                    errorMessage = '服务器内部错误，请稍后再试';
+                }
+                
+                showError(errorMessage);
+                
+                // 如果是网络错误且还有重试次数
+                if (error.message.includes('Failed to fetch') && retryCount > 0) {
+                    console.log(`网络错误，尝试重新保存 (剩余重试次数: ${retryCount})`);
+                    return saveDanmuToPublic(username, text, retryCount - 1);
+                }
+                
+                return null;
+            }
+        }
+   
+        // 清空本地数据
+        function clearLocalData() {
+            if (confirm('确定要清空本地弹幕数据吗？此操作不可撤销！')) {
+                localStorage.removeItem(DANMU_KEY);
+                showError('本地弹幕数据已清空');
+                
+                // 重新初始化弹幕
+                initDanmu();
+            }
+        }
+
+        // 页面卸载时清理定时器
+        window.addEventListener('beforeunload', function() {
+            clearInterval(danmuInterval);
+        });
+                
+        // 渲染管理员弹幕列表
+        function renderAdminWishes() {
+            const container = document.getElementById('admin-wish-container');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            const danmus = getLocalDanmus();
+            
+            if (danmus.length === 0) {
+                container.innerHTML = '<p class="text-center py-4 text-gray-400">暂无弹幕</p>';
+                return;
+            }
+            
+            danmus.forEach(danmu => {
+                const danmuElement = document.createElement('div');
+                danmuElement.className = 'wish-item';
+                danmuElement.innerHTML = `
+                    <div class="wish-content">
+                        <div class="wish-author">${danmu.username}</div>
+                        <div class="wish-text">${danmu.text}</div>
+                        <div class="text-xs text-gray-400">${new Date(danmu.timestamp).toLocaleString()}</div>
+                    </div>
+                    <div class="admin-controls">
+                        <button class="btn-danger delete-btn" data-id="${danmu.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(danmuElement);
+            });
+            
+            // 添加删除事件监听器
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const danmuId = this.getAttribute('data-id');
+                    deleteWish(danmuId);
+                });
+            });
+        }
+        
+        // 修复点4：管理员登录函数
+        function adminLogin() {
+            const password = adminPassword.value;
+            
+            if (password === ADMIN_PASSWORD) {
+                // 隐藏登录表单
+                loginForm.classList.add('hidden');
+                // 显示管理内容
+                adminContent.classList.remove('hidden');
+                
+                adminPassword.value = '';
+                renderAdminWishes();
+                showError('管理员登录成功'); // 使用showError替代showToast
+            } else {
+                showError('密码错误，请重试'); // 使用showError替代showToast
+            }
+        }
+
+        
+        function adminLogout() {
+            // 隐藏管理内容
+            adminContent.classList.add('hidden');
+            // 显示登录表单
+            loginForm.classList.remove('hidden');
+            
+            showError('已退出管理员模式');
+        }
+        
+        function closeAdminPanel() {
+            adminSection.classList.add('hidden');
+            showError('已关闭管理面板');
+        }
+        
+        function clearAllWishes() {
+            if (confirm('确定要清空所有祝福吗？此操作不可撤销！')) {
+                localStorage.removeItem(WISHES_KEY);
+                showError('所有祝福已清空');
+                renderAdminWishes();
+            }
+        }
+        
+        // 合并弹幕数据（公共 + 本地）
+       async function getCombinedDanmus() {
+            const publicDanmus = await fetchPublicDanmus();
+            const localDanmus = getLocalDanmus();
+            
+            // 创建唯一标识符集合
+            const seen = new Set();
+            const uniqueDanmus = [];
+            
+            // 合并并去重
+            const combined = [...publicDanmus, ...localDanmus];
+            
+            for (const danmu of combined) {
+                // 创建唯一标识符（用户名+内容）
+                const identifier = `${danmu.username}-${danmu.text}`;
+                
+                // 如果未见过则添加
+                if (!seen.has(identifier)) {
+                    seen.add(identifier);
+                    uniqueDanmus.push(danmu);
+                }
+            }
+            
+            return uniqueDanmus;
+        }
+
+
+        // 自动同步弹幕
+        const autoSyncCheckbox = document.getElementById('autoSync');
+        if (autoSyncCheckbox) {
+            setInterval(() => {
+                if (autoSyncCheckbox.checked) {
+                    initDanmu();
+                }
+            }, 30000); // 每30秒同步一次
+        }
+        
+        // 烟花特效函数 - 只在倒计时结束后触发
+        function startFireworks() {
+            if (fireworksStarted) return;
+            fireworksStarted = true;
+            
+            const container = document.getElementById('fireworks-container');
+            if (!container) return;
+            
+            // 显示烟花容器
+            container.style.display = 'block';
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            container.appendChild(canvas);
+            
+            const ctx = canvas.getContext('2d');
+            const fireworks = [];
+            
+            function createFirework(x, y) {
+                const particles = [];
+                const color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                
+                for (let i = 0; i < 100; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 5 + 2;
+                    particles.push({
+                        x,
+                        y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        radius: Math.random() * 2 + 1,
+                        color,
+                        alpha: 1
+                    });
+                }
+                
+                fireworks.push(particles);
+            }
+            
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // 添加新烟花
+                if (Math.random() < 0.05) {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height * 0.5;
+                    createFirework(x, y);
+                }
+                
+                // 更新和绘制所有粒子
+                for (let i = fireworks.length - 1; i >= 0; i--) {
+                    const particles = fireworks[i];
+                    
+                    for (let j = particles.length - 1; j >= 0; j--) {
+                        const p = particles[j];
+                        
+                        // 更新位置
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.alpha -= 0.01;
+                        
+                        // 移除消失的粒子
+                        if (p.alpha <= 0) {
+                            particles.splice(j, 1);
+                            continue;
+                        }
+                        
+                        // 绘制粒子
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                        ctx.fillStyle = `rgba(${parseInt(p.color.slice(4, 7))}, ${parseInt(p.color.slice(9, 12))}, ${parseInt(p.color.slice(14, 17))}, ${p.alpha})`;
+                        ctx.fill();
+                    }
+                    
+                    // 移除空粒子组
+                    if (particles.length === 0) {
+                        fireworks.splice(i, 1);
+                    }
+                }
+                
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+        }
+        
+        // 歌词数据
+        const lyrics = [
+            {type: "section", text: "[Verse]"},
+            {text: "不过是最初的我们 守着屏幕那盏灯"},
+            {text: "这世界最珍贵的不是天分"},
+            {text: "是你歌声里的真 是我们相伴的程"},
+            {text: "从几人到千万 故事不必多问"},
+            {type: "section", text: "[Verse]"},
+            {text: "曾经你吉他轻弹 曾经我们孤单相伴"},
+            {text: "现在都成为你闪耀的资本"},
+            {text: "跟着你大喝一声 定乾坤"},
+            {text: "新岁再攀更高峰"},
+            {type: "section", text: "[Chorus]"},
+            {text: "不过是 半山腰 怎敢与 天争高"},
+            {text: "这一路 星潮 有多少"},
+            {text: "眼一闭 心狂跳 你一跃 万丈高"},
+            {text: "我们在 山脚 为你叫好"},
+            {type: "section", text: "[Bridge]"},
+            {text: "从青涩到今朝 从地下到舞台中央"},
+            {text: "每首歌 都是我们的勋章"},
+            {text: "生日快乐歌 此刻为你唱"},
+            {text: "新程在脚下 共赴下一程"},
+            {type: "section", text: "[Outro]"},
+            {text: "生日快乐 我的英雄"},
+            {text: "这一路 有你 有我"},
+            {text: "到山顶 再共唱这首歌"},
+            {text: "新程再启 星光不落"}
+        ];
+        
+        // 当前高亮歌词索引
+        let currentLyricIndex = 0;
+        
+        // 显示错误消息
+        function showError(message) {
+            const errorEl = document.getElementById('errorMessage');
+            if (!errorEl) return;
+            
+            errorEl.textContent = message;
+            errorEl.classList.add('show');
+            
+            setTimeout(() => {
+                errorEl.classList.remove('show');
+            }, 3000);
+        }
+        
+        // 初始化歌词显示
+        function initLyrics() {
+            const lyricsContent = document.getElementById('lyricsContent');
+            if (!lyricsContent) return;
+            
+            lyricsContent.innerHTML = '';
+            
+            lyrics.forEach((line, index) => {
+                let lineElement = document.createElement('div');
+                
+                if (line.type === "section") {
+                    lineElement.className = 'lyrics-section';
+                    lineElement.textContent = line.text;
+                } else {
+                    lineElement.className = 'lyrics-line';
+                    lineElement.textContent = line.text;
+                    lineElement.dataset.index = index;
+                }
+                
+                lyricsContent.appendChild(lineElement);
+            });
+        }
+        
+        // 更新歌词高亮
+        function updateLyricsHighlight() {
+            const lyricsLines = document.querySelectorAll('.lyrics-line');
+            
+            // 移除所有高亮
+            lyricsLines.forEach(line => {
+                line.classList.remove('active');
+            });
+            
+            // 高亮当前行
+            if (lyricsLines[currentLyricIndex]) {
+                lyricsLines[currentLyricIndex].classList.add('active');
+                
+                // 滚动到当前行
+                lyricsLines[currentLyricIndex].scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }
+        }
+        
+        // 更新歌词进度
+        function updateLyricsProgress() {
+            if (!birthdayAudio) return;
+            
+            // 计算当前播放进度
+            const progress = (birthdayAudio.currentTime / birthdayAudio.duration) * 100;
+            const progressBar = document.getElementById('progressBar');
+            if (progressBar) {
+                progressBar.style.width = `${progress}%`;
+            }
+            
+            // 更新歌词高亮
+            const totalLyrics = lyrics.filter(line => !line.type).length;
+            const lyricProgress = Math.floor((birthdayAudio.currentTime / birthdayAudio.duration) * totalLyrics);
+            
+            // 找到下一个歌词索引
+            let lyricIndex = 0;
+            let count = 0;
+            
+            for (let i = 0; i < lyrics.length; i++) {
+                if (!lyrics[i].type) {
+                    if (count === lyricProgress) {
+                        lyricIndex = i;
+                        break;
+                    }
+                    count++;
+                }
+            }
+            
+            if (currentLyricIndex !== lyricIndex) {
+                currentLyricIndex = lyricIndex;
+                updateLyricsHighlight();
+            }
+        }
+        
+        // 初始化移动端菜单功能
+        function initMobileMenu() {
+            const menuButton = document.getElementById('mobileMenuButton');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            if (menuButton && mobileMenu) {
+                menuButton.addEventListener('click', function(event) {
+                    event.stopPropagation();
+                    mobileMenu.classList.toggle('hidden');
+                    
+                    // 切换图标
+                    const icon = this.querySelector('i');
+                    if (mobileMenu.classList.contains('hidden')) {
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    } else {
+                        icon.classList.remove('fa-bars');
+                        icon.classList.add('fa-times');
+                    }
+                });
+                
+                // 点击页面其他区域关闭移动端菜单
+                document.addEventListener('click', function(event) {
+                    const isClickInsideNav = document.getElementById('mainNav')?.contains(event.target);
+                    
+                    if (!isClickInsideNav && mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                        const icon = menuButton.querySelector('i');
+                        if (icon) {
+                            icon.classList.remove('fa-times');
+                            icon.classList.add('fa-bars');
+                        }
+                    }
+                });
+            }
+        }
+        
+        // 初始化礼物盒交互
+        function initGiftInteraction() {
+            const overlay = document.getElementById('giftOverlay');
+            const giftImage = document.getElementById('giftImage');
+            const clickText = document.getElementById('clickText');
+            const websiteContent = document.querySelector('.website-content');
+            
+            if (giftImage) {
+                // 添加摇晃效果
+                giftImage.addEventListener('mouseenter', function() {
+                    this.classList.add('shake');
+                });
+                
+                giftImage.addEventListener('animationend', function() {
+                    this.classList.remove('shake');
+                });
+                
+                // 点击礼物盒
+                giftImage.addEventListener('click', openGift);
+            }
+            
+            if (clickText) {
+                clickText.addEventListener('click', openGift);
+            }
+            
+            function openGift() {
+                if (overlay) overlay.classList.add('hidden');
+                
+                // 初始化音频元素
+                birthdayAudio = document.getElementById('birthdaySong');
+                
+                // 预加载音频
+                if (birthdayAudio) {
+                    birthdayAudio.load();
+                    audioInitialized = true;
+                    
+                    // 添加错误处理
+                    birthdayAudio.addEventListener('error', function() {
+                        showError('音频加载失败，请刷新页面重试');
+                    });
+                }
+                
+                // 初始化歌词
+                initLyrics();
+                
+                setTimeout(() => {
+                    if (websiteContent) websiteContent.classList.add('visible');
+                    
+                    // 初始化祝福墙
+                    initWishWall();
+                    
+                    // 初始化烟花特效
+                    initFireworks();
+                }, 400);
+            }
+        }
+        
+        // 生日倒计时功能
+        function updateCountdown() {
+            // 在函数内部获取 DOM 元素
+            const daysEl = document.getElementById('days');
+            const hoursEl = document.getElementById('hours');
+            const minutesEl = document.getElementById('minutes');
+            const secondsEl = document.getElementById('seconds');
+            const countdownText = document.getElementById('countdownText');
+            
+            const now = new Date();
+            const targetDate = new Date(now.getFullYear(), 9, 8); // 10月8日 (月份从0开始)
+
+            const diff = targetDate - now;
+
+            // 如果倒计时结束
+            if (diff <= 0) {
+                clearInterval(countdownInterval);
+                triggerBirthdayCelebration();
+                if (daysEl) daysEl.textContent = '00';
+                if (hoursEl) hoursEl.textContent = '00';
+                if (minutesEl) minutesEl.textContent = '00';
+                if (secondsEl) secondsEl.textContent = '00';
+                return;
+            }
+            
+            // 计算天、时、分、秒
             const days = Math.floor(diff / (1000 * 60 * 60 * 24));
             const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
             
-            document.getElementById('days').textContent = days.toString().padStart(2, '0');
-            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
-            
-            document.getElementById('countdownText').textContent = `${days}天${hours}小时${minutes}分钟${seconds}秒`;
-            
-            // 如果倒计时结束
-            if (diff <= 0) {
-                clearInterval(countdownInterval);
-                triggerBirthdayCelebration();
-            }
+            // 更新显示
+            if (daysEl) daysEl.textContent = days.toString().padStart(2, '0');
+            if (hoursEl) hoursEl.textContent = hours.toString().padStart(2, '0');
+            if (minutesEl) minutesEl.textContent = minutes.toString().padStart(2, '0');
+            if (secondsEl) secondsEl.textContent = seconds.toString().padStart(2, '0');
+            if (countdownText) countdownText.textContent = `${days}天${hours}小时${minutes}分钟${seconds}秒`;
         }
         
-        const countdownInterval = setInterval(updateCountdown, 1000);
-        updateCountdown();
-
-        // 触发生日庆祝效果 - 优化后的烟花特效
+        // 设置倒计时更新间隔
+        let countdownInterval;
+        
+        // 触发生日庆祝效果
         function triggerBirthdayCelebration() {
-            document.getElementById('countdownText').textContent = "生日快乐！";
-            document.getElementById('birthdayMessage').classList.remove('hidden');
-            // 显示音乐播放器并播放
-            document.getElementById('birthdaySong').style.display = 'block';
-            createFireworks();
-            document.getElementById('birthdaySong').play();
+            const countdownText = document.getElementById('countdownText');
+            const birthdayMessage = document.getElementById('birthdayMessage');
+            // 启动烟花特效
+            startFireworks();
+            
+            if (countdownText) countdownText.textContent = "生日快乐！";
+            if (birthdayMessage) birthdayMessage.classList.remove('hidden');
+            
+            // 显示播放按钮
+            const playButton = document.getElementById('playButton');
+            if (playButton) playButton.style.display = 'block';
         }
 
-        // 优化后的烟花特效
-        function createFireworks() {
-            const colors = [
-                '#FF0000', '#FF4500', '#FF8C00', '#FFA500', 
-                '#FFD700', '#FFFF00', '#9ACD32', '#00FF00',
-                '#00FA9A', '#00BFFF', '#1E90FF', '#0000FF',
-                '#8A2BE2', '#9932CC', '#DA70D6', '#FF1493'
-            ];
-            
-            // 粒子数量增加至原来的2倍
-            for (let i = 0; i < 100; i++) {
-                setTimeout(() => {
-                    // 创建彩色粒子
-                    const firework = document.createElement('div');
-                    firework.className = 'firework';
-                    firework.style.left = `${Math.random() * 100}%`;
-                    firework.style.top = `${Math.random() * 100}%`;
-                    firework.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        // 播放生日歌
+        function initPlayButton() {
+            const playButton = document.getElementById('playButton');
+            if (playButton) {
+                playButton.addEventListener('click', function() {
+                    if (!audioInitialized) return;
                     
-                    // 扩大扩散范围30%
-                    const tx = (Math.random() - 0.5) * 260; // 原200，增加30%
-                    const ty = (Math.random() - 0.5) * 260; // 原200，增加30%
-                    firework.style.setProperty('--tx', `${tx}px`);
-                    firework.style.setProperty('--ty', `${ty}px`);
-                    
-                    document.body.appendChild(firework);
-                    
-                    // 动画结束后移除元素
-                    setTimeout(() => {
-                        firework.remove();
-                    }, 3000);
-                    
-                    // 添加金色闪光粒子
-                    if (i % 5 === 0) {
-                        const goldParticle = document.createElement('div');
-                        goldParticle.className = 'gold-particle';
-                        goldParticle.style.left = `${Math.random() * 100}%`;
-                        goldParticle.style.top = `${Math.random() * 100}%`;
+                    if (birthdayAudio) {
+                        // 显示歌词框
+                        const lyricsContainer = document.getElementById('lyricsContainer');
+                        if (lyricsContainer) lyricsContainer.style.display = 'block';
+                        lyricsVisible = true;
                         
-                        const goldTx = (Math.random() - 0.5) * 260;
-                        const goldTy = (Math.random() - 0.5) * 260;
-                        goldParticle.style.setProperty('--tx', `${goldTx}px`);
-                        goldParticle.style.setProperty('--ty', `${goldTy}px`);
-                        
-                        document.body.appendChild(goldParticle);
-                        
-                        setTimeout(() => {
-                            goldParticle.remove();
-                        }, 3000);
+                        // 尝试播放音频
+                        birthdayAudio.play().then(() => {
+                            this.style.display = 'none';
+                            
+                            // 开始更新歌词进度
+                            birthdayAudio.addEventListener('timeupdate', updateLyricsProgress);
+                            
+                            // 歌曲结束时重置
+                            birthdayAudio.addEventListener('ended', function() {
+                                if (playButton) playButton.style.display = 'block';
+                                currentLyricIndex = 0;
+                                updateLyricsHighlight();
+                                const progressBar = document.getElementById('progressBar');
+                                if (progressBar) progressBar.style.width = '0%';
+                            });
+                        }).catch(error => {
+                            showError('播放失败，请检查音频链接是否有效');
+                        });
                     }
-                }, i * 50);
+                });
             }
         }
 
-        // 弹幕功能
-        const danmuColors = ['#3b82f6', '#1d4ed8', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
-        
-        document.getElementById("sendDanmu").addEventListener("click", function() {
-            const username = document.getElementById("usernameInput").value.trim() || "匿名";
-            const text = document.getElementById("danmuInput").value.trim();
-            if (text) {
-                sendDanmu(username, text);
-                document.getElementById("usernameInput").value = ""; // 清空昵称输入框
-                document.getElementById("danmuInput").value = ""; // 清空祝福语输入框
-                document.getElementById('danmuInput').value = '';
+        // 关闭歌词框
+        function initCloseLyricsButton() {
+            const closeLyrics = document.getElementById('closeLyrics');
+            if (closeLyrics) {
+                closeLyrics.addEventListener('click', function() {
+                    const lyricsContainer = document.getElementById('lyricsContainer');
+                    if (lyricsContainer) lyricsContainer.style.display = 'none';
+                    lyricsVisible = false;
+                    
+                    // 暂停音频
+                    if (birthdayAudio) {
+                        birthdayAudio.pause();
+                        const playButton = document.getElementById('playButton');
+                        if (playButton) playButton.style.display = 'block';
+                    }
+                });
             }
-        });
-        
-        document.getElementById("danmuInput").addEventListener("keypress", function(e) {
-            if (e.key === "Enter") {
-                const username = document.getElementById("usernameInput").value.trim() || "匿名";
-                const text = this.value.trim();
-                if (text) {
-                    sendDanmu(username, text);
-                    document.getElementById("usernameInput").value = ""; // 清空昵称输入框
-                    this.value = ""; // 清空祝福语输入框
-                    this.value = '';
-                }
-            }
-        });
-        
-        function sendDanmu(username, text) {
-            const danmu = document.createElement('div');
-            danmu.className = 'danmu';
-            danmu.textContent = username + "：" + text;
-            danmu.style.color = danmuColors[Math.floor(Math.random() * danmuColors.length)];
-            
-            danmu.style.color = danmuColors[Math.floor(Math.random() * danmuColors.length)];
-            
-            // 随机高度
-            const top = Math.random() * 80 + 10; // 10% - 90%
-            danmu.style.top = `${top}%`;
-            
-            // 随机速度
-            const duration = Math.random() * 10 + 5; // 5-15秒
-            danmu.style.animationDuration = `${duration}s`;
-            
-            document.getElementById('danmuContainer').appendChild(danmu);
-            
-            // 动画结束后移除元素
-            setTimeout(() => {
-                danmu.remove();
-            }, duration * 1000);
         }
-        
-        // 模拟一些初始弹幕
-        const sampleDanmus = [
-            {username: "粉丝1", text: "冯子晨生日快乐！"},
-            {username: "粉丝2", text: "永远支持你！"},
-            {username: "粉丝3", text: "新专辑大卖！"},
-            {username: "粉丝4", text: "期待你的演唱会！"},
-            {username: "粉丝5", text: "你是最棒的！"},
-            {username: "粉丝6", text: "生日快乐，爱你！"},
-            {username: "粉丝7", text: "祝事业蒸蒸日上！"},
-            {username: "粉丝8", text: "期待更多好作品！"}
-        ];
-        
-        // 初始发送一些弹幕
-        sampleDanmus.forEach((item, i) => {
-            setTimeout(() => {
-                sendDanmu(item.username, item.text);
-            }, i * 2000);
-        });
-        
-        // 每隔一段时间发送一条弹幕
-        setInterval(() => {
-            const randomItem = sampleDanmus[Math.floor(Math.random() * sampleDanmus.length)];
-            sendDanmu(randomItem.username, randomItem.text);
-        }, 5000);
 
-        // 移动端导航菜单切换
-        const menuButton = document.getElementById('mobileMenuButton');
-        const mobileMenu = document.getElementById('mobileMenu');
-
-        menuButton.addEventListener('click', function() {
-            mobileMenu.classList.toggle('hidden');
-
-            // 切换图标
-            const icon = this.querySelector('i');
-            if (mobileMenu.classList.contains('hidden')) {
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
-            } else {
-                icon.classList.remove('fa-bars');
-                icon.classList.add('fa-times');
+        // 祝福墙功能（整合弹幕功能）
+       function initWishWall() {
+            const wishContainer = document.getElementById('wishContainer');
+            const moreWishContainer = document.getElementById('moreWishContainer');
+            
+            if (!wishContainer || !moreWishContainer) {
+                console.error("祝福墙容器未找到");
+                return;
             }
-        });
-
-        // 点击页面其他区域关闭移动端菜单
-        document.addEventListener('click', function(event) {
-            const isClickInsideNav = document.getElementById('mainNav').contains(event.target);
-
-            if (!isClickInsideNav && !mobileMenu.classList.contains('hidden')) {
-                mobileMenu.classList.add('hidden');
-                const icon = menuButton.querySelector('i');
-                icon.classList.remove('fa-times');
-                icon.classList.add('fa-bars');
-            }
-        });
-
-        // 平滑滚动
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
+            
+            // 清空容器
+            wishContainer.innerHTML = '';
+            moreWishContainer.innerHTML = '';
+            
+            try {
+                // 获取所有祝福并按时间排序（最新的在前）
+                const danmus = getLocalDanmus();
+                console.log('所有弹幕数据:', danmus);
+                
+                allWishes = danmus.sort((a, b) => {
+                    const timeA = new Date(a.timestamp || 0);
+                    const timeB = new Date(b.timestamp || 0);
+                    return timeB - timeA;
+                });
+                
+                console.log('排序后的弹幕数据:', allWishes);
+                
+                // 分离初始显示和折叠的祝福
+                const initialWishes = allWishes.slice(0, MAX_INITIAL_WISHES);
+                const collapsedWishes = allWishes.slice(MAX_INITIAL_WISHES);
+                
+                console.log('初始祝福:', initialWishes);
+                console.log('折叠祝福:', collapsedWishes);
+                
+                // 渲染初始祝福
+                initialWishes.forEach(wish => {
+                    addWishToWall(wish, wishContainer);
                 });
 
-                // 点击导航链接后关闭移动端菜单
-                if (!mobileMenu.classList.contains('hidden')) {
-                    mobileMenu.classList.add('hidden');
-                    const icon = menuButton.querySelector('i');
-                    icon.classList.remove('fa-times');
-                    icon.classList.add('fa-bars');
+                // 渲染折叠的祝福
+                collapsedWishes.forEach(wish => {
+                    addWishToWall(wish, moreWishContainer);
+                });
+                
+                // 更新查看更多按钮状态
+                updateViewMoreButton(collapsedWishes.length > 0);
+            } catch (error) {
+                console.error('初始化祝福墙失败:', error);
+                showError('加载祝福失败');
+            }
+        }
+
+        // 添加一个新函数来管理"查看更多"按钮的状态：
+        function updateViewMoreButton(hasMoreWishes) {
+            const viewMoreBtn = document.getElementById('viewMoreBtn');
+            const viewLessBtn = document.getElementById('viewLessBtn');
+            const collapsedSection = document.getElementById('collapsedWishes');
+            
+            if (!viewMoreBtn || !viewLessBtn || !collapsedSection) return;
+            
+            if (hasMoreWishes) {
+                viewMoreBtn.classList.remove('hidden');
+                viewLessBtn.classList.add('hidden');
+                collapsedSection.classList.add('hidden');
+            } else {
+                viewMoreBtn.classList.add('hidden');
+                viewLessBtn.classList.add('hidden');
+            }
+        }
+
+        // 只保留这个版本的addWishToWall函数
+        function addWishToWall(wish, container) {
+            if (!container) {
+                console.error('Container not found');
+                return;
+            }
+            
+            // 确保使用正确的属性名
+            const username = wish.username || '匿名用户';
+            const text = wish.text || '未知祝福';
+            const timestamp = wish.timestamp ? new Date(wish.timestamp).toLocaleTimeString() : '未知时间';
+            
+            const wishElement = document.createElement('div');
+            wishElement.className = 'wish-card glassmorphism p-4';
+            wishElement.innerHTML = `
+                <h4 class="font-semibold text-yellow-400 wish-author">${username}</h4>
+                <p class="text-sm mt-2">${text}</p>
+                <div class="text-xs text-gray-500 mt-2">${timestamp}</div>
+            `;
+            
+            container.appendChild(wishElement);
+        }
+                
+        // 定时发送弹幕（带密度控制）
+        function startDanmu() {
+            // 清除现有弹幕定时器
+            clearInterval(danmuInterval);
+            
+            // 清除弹幕容器内容
+            const danmuContainer = document.getElementById('danmuContainer');
+            if (danmuContainer) danmuContainer.innerHTML = '';
+            
+            // 创建已发送弹幕的追踪器
+            const sentDanmus = new Set();
+            
+            // 发送所有弹幕（每条只发送一次）
+            globalDanmus.forEach((danmu, index) => {
+                // 添加随机延迟，使弹幕不会同时出现
+                setTimeout(() => {
+                    // 检查是否已发送过
+                    const identifier = `${danmu.username}-${danmu.text}`;
+                    if (!sentDanmus.has(identifier)) {
+                        sendDanmu(danmu.username, danmu.text);
+                        sentDanmus.add(identifier);
+                    }
+                }, index * 900); // 每条弹幕间隔900ms
+            });
+            
+            // 不再设置定时器重复发送
+        }
+
+        // 平滑滚动
+        function initSmoothScroll() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth'
+                        });
+                    }
+                    
+                    // 点击导航链接后关闭移动端菜单
+                    const mobileMenu = document.getElementById('mobileMenu');
+                    if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                        const menuButton = document.getElementById('mobileMenuButton');
+                        if (menuButton) {
+                            const icon = menuButton.querySelector('i');
+                            if (icon) {
+                                icon.classList.remove('fa-times');
+                                icon.classList.add('fa-bars');
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
+        // 修复渲染函数
+        function renderAdminWishes() {
+            const container = document.getElementById('admin-wish-container');
+            if (!container) return;
+            
+            container.innerHTML = '';
+            const danmus = getLocalDanmus();
+            
+            if (danmus.length === 0) {
+                container.innerHTML = '<p class="text-center py-4 text-gray-400">暂无弹幕</p>';
+                return;
+            }
+            
+            danmus.forEach(danmu => {
+                const danmuElement = document.createElement('div');
+                danmuElement.className = 'wish-item';
+                danmuElement.innerHTML = `
+                    <div class="wish-content">
+                        <div class="wish-author">${danmu.username}</div>
+                        <div class="wish-text">${danmu.text}</div>
+                        <div class="text-xs text-gray-400">${new Date(danmu.timestamp).toLocaleString()}</div>
+                    </div>
+                    <div class="admin-controls">
+                        <button class="btn-danger delete-btn" data-id="${danmu.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(danmuElement);
+            });
+            
+            // 添加删除事件监听器
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const danmuId = this.getAttribute('data-id');
+                    deleteWish(danmuId);
+                });
+            });
+        }
+            
+            // 格式化日期
+            function formatDate(timestamp) {
+                const date = new Date(timestamp);
+                return `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+            }
+            
+            // 添加新祝福
+            function addWish(name, message) {
+                if (!name.trim() || !message.trim()) {
+                    showToast('请填写完整的祝福信息！', 'error');
+                    return;
+                }
+                
+                const wishes = JSON.parse(localStorage.getItem(WISHES_KEY)) || [];
+                const newWish = {
+                    id: Date.now(),
+                    name: name.trim(),
+                    message: message.trim()
+                };
+                
+                wishes.push(newWish);
+                localStorage.setItem(WISHES_KEY, JSON.stringify(wishes));
+                
+                // 清空输入框
+                document.getElementById('wish-name').value = '';
+                document.getElementById('wish-message').value = '';
+                
+                showToast('祝福已发送！');
+                renderWishes();
+                
+                // 发送弹幕
+                sendDanmu(newWish.name, newWish.message);
+            }
+            
+            // 删除弹幕
+            function deleteWish(wishId) {
+                // 确保ID是数字
+                wishId = parseInt(wishId);
+                
+                // 获取弹幕数据
+                let danmus = getLocalDanmus();
+                const initialCount = danmus.length;
+                
+                // 过滤掉要删除的弹幕
+                danmus = danmus.filter(danmu => danmu.id !== wishId);
+                
+                if (danmus.length === initialCount) {
+                    showError('删除失败，未找到该弹幕');
+                    return;
+                }
+                
+                // 保存更新后的弹幕数据
+                localStorage.setItem(DANMU_KEY, JSON.stringify(danmus));
+                showError('弹幕已删除');
+                
+                // 更新全局数组
+                globalDanmus = globalDanmus.filter(danmu => danmu.id !== wishId);
+
+                // 重启弹幕
+                startDanmu();
+                
+                // 更新UI
+                renderAdminWishes();
+                initWishWall(); // 同时更新祝福墙
+            }
+
+            
+            // 清空所有祝福
+            function clearAllWishes() {
+                if (confirm('确定要清空所有祝福吗？此操作不可撤销！')) {
+                    localStorage.removeItem(DANMU_KEY);
+                    showError('所有祝福已清空');
+                    renderAdminWishes();
+                    initWishWall(); // 同时更新祝福墙
+                }
+            }
+            
+            // 管理员登录
+            function adminLogin() {
+                const passwordInput = document.getElementById('admin-password');
+                const password = passwordInput.value;
+                
+                if (password === ADMIN_PASSWORD) {
+                    // 隐藏登录表单
+                    loginForm.classList.add('hidden');
+                    // 显示管理内容
+                    adminContent.classList.remove('hidden');
+                    
+                    passwordInput.value = '';
+                    renderAdminWishes();
+                    showToast('管理员登录成功');
+                } else {
+                    showToast('密码错误，请重试', 'error');
+                }
+            }
+            
+            // 管理员退出
+            function adminLogout() {
+                // 隐藏管理内容
+                adminContent.classList.add('hidden');
+                // 显示登录表单
+                loginForm.classList.remove('hidden');
+                
+                showToast('已退出管理员模式');
+            }
+            
+            // 关闭管理模块
+            function closeAdminPanel() {
+                adminSection.classList.add('hidden');
+                showToast('已关闭管理面板');
+            }
+        
+        // 键盘快捷键（空格播放/暂停）
+        function initKeyboardShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                if (e.code === 'Space' && lyricsVisible) {
+                    e.preventDefault();
+                    if (birthdayAudio) {
+                        if (birthdayAudio.paused) {
+                            birthdayAudio.play();
+                        } else {
+                            birthdayAudio.pause();
+                        }
+                    }
                 }
             });
+        }
+        
+        // 图片懒加载
+        function initLazyLoading() {
+            const lazyImages = document.querySelectorAll('.lazy-image');
+            
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        const src = img.getAttribute('src');
+                        
+                        // 创建新Image对象预加载
+                        const tempImg = new Image();
+                        tempImg.src = src;
+                        tempImg.onload = function() {
+                            img.classList.add('loaded');
+                        };
+                        tempImg.onerror = function() {
+                            console.error('图片加载失败:', src);
+                        };
+                        
+                        observer.unobserve(img);
+                    }
+                });
+            }, {
+                rootMargin: '0px 0px 100px 0px' // 提前100px加载
+            });
+            
+            lazyImages.forEach(img => {
+                observer.observe(img);
+            });
+        }
+        
+        // 初始化烟花特效
+        function initFireworks() {
+            const container = document.getElementById('fireworks-container');
+            if (!container) return;
+            
+            // 简化版烟花效果
+            const canvas = document.createElement('canvas');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            container.appendChild(canvas);
+            
+            const ctx = canvas.getContext('2d');
+            const fireworks = [];
+            
+            function createFirework(x, y) {
+                const particles = [];
+                const color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                
+                for (let i = 0; i < 100; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = Math.random() * 5 + 2;
+                    particles.push({
+                        x,
+                        y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        radius: Math.random() * 2 + 1,
+                        color,
+                        alpha: 1
+                    });
+                }
+                
+                fireworks.push(particles);
+            }
+            
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // 随机添加新烟花
+                if (Math.random() < 0.05) {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height * 0.5;
+                    createFirework(x, y);
+                }
+                
+                // 更新和绘制所有粒子
+                for (let i = fireworks.length - 1; i >= 0; i--) {
+                    const particles = fireworks[i];
+                    
+                    for (let j = particles.length - 1; j >= 0; j--) {
+                        const p = particles[j];
+                        
+                        // 更新位置
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.alpha -= 0.01;
+                        
+                        // 移除消失的粒子
+                        if (p.alpha <= 0) {
+                            particles.splice(j, 1);
+                            continue;
+                        }
+                        
+                        // 绘制粒子
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                        ctx.fillStyle = `rgba(${parseInt(p.color.slice(4, 7))}, ${parseInt(p.color.slice(9, 12))}, ${parseInt(p.color.slice(14, 17))}, ${p.alpha})`;
+                        ctx.fill();
+                    }
+                    
+                    // 移除空粒子组
+                    if (particles.length === 0) {
+                        fireworks.splice(i, 1);
+                    }
+                }
+                
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+        }
+        
+        // 页面加载进度模拟
+        function simulateLoadingProgress() {
+            const loadingBar = document.getElementById('loading-bar');
+            if (!loadingBar) return;
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 10;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        loadingBar.style.opacity = '0';
+                        setTimeout(() => {
+                            loadingBar.style.display = 'none';
+                        }, 300);
+                    }, 300);
+                }
+                loadingBar.style.width = `${progress}%`;
+            }, 100);
+        }
+
+
+        
+        // 初始化所有功能
+        document.addEventListener('DOMContentLoaded', function() {
+            // 模拟加载进度
+            simulateLoadingProgress();
+            
+            // 初始化移动端菜单
+            initMobileMenu();
+            
+            // 初始化礼物盒交互
+            initGiftInteraction();
+            
+            // 初始化播放按钮
+            initPlayButton();
+
+            // 页面加载时初始化弹幕
+            initDanmu();
+
+            // 监听页面刷新事件
+            window.addEventListener('beforeunload', function() {
+                // 清除弹幕容器
+                const danmuContainer = document.getElementById('danmuContainer');
+                if (danmuContainer) danmuContainer.innerHTML = '';
+            });
+            // 初始化关闭歌词按钮
+            initCloseLyricsButton();
+
+            // 确保 DOM 元素存在后再调用
+            if (document.getElementById('days') && 
+                document.getElementById('hours') && 
+                document.getElementById('minutes') && 
+                document.getElementById('seconds')) {
+                
+                // 初始化倒计时
+                countdownInterval = setInterval(updateCountdown, 1000);
+                updateCountdown();
+            } else {
+                console.error('倒计时元素未找到');
+            }
+            
+
+            // 设置祝福展开功能
+            setupWishExpansion();
+            
+            // 添加祝福事件监听
+            const submitWishButton = document.getElementById('submitWish');
+            if (submitWishButton) {
+                submitWishButton.addEventListener('click', submitWish);
+            }
+
+            // 管理面板事件监听
+            if (closeAdminBtn) {
+                closeAdminBtn.addEventListener('click', closeAdminPanel);
+            }
+            
+            if (loginBtn) {
+                loginBtn.addEventListener('click', adminLogin);
+            }
+            
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', closeAdminPanel);
+            }
+            
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', adminLogout);
+            }
+            
+            if (clearAllBtn) {
+                clearAllBtn.addEventListener('click', clearAllWishes);
+            }
+            
+            // 导航链接点击事件
+            document.querySelectorAll('a[href="#admin"]').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.getElementById('admin').classList.remove('hidden');
+                    document.getElementById('admin').scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+            
+            // 关闭管理面板按钮
+            document.getElementById('close-admin-btn').addEventListener('click', function() {
+                document.getElementById('admin').classList.add('hidden');
+            });
+
+            // 确保只对存在的元素添加事件监听
+            const wishMessage = document.getElementById('wishMessage');
+            if (wishMessage) {
+                wishMessage.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        submitWish();
+                    }
+                });
+            }
+            
+            // 初始化弹幕
+            startDanmu();
+            
+            // 初始化平滑滚动
+            initSmoothScroll();
+            
+            // 初始化键盘快捷键
+            initKeyboardShortcuts();
+            
+            // 初始化图片懒加载
+            initLazyLoading();
         });
     </script>
-</div>
 </body>
 </html>
