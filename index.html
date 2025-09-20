@@ -1473,9 +1473,9 @@
             
             // 获取输入值
             const username = nameInput.value.trim();
-            const message = messageInput.value.trim();
+            const text = messageInput.value.trim();
             
-            console.log('提交祝福:', {username, message});
+            console.log('提交祝福:', {username, text});
             
             // 验证输入
             if (!username) {
@@ -1484,7 +1484,7 @@
                 return;
             }
             
-            if (!message) {
+            if (!text) {
                 showError('请输入祝福内容');
                 messageInput.focus();
                 return;
@@ -1492,7 +1492,7 @@
 
             try {
                 // 添加去重检查
-                const identifier = `${username}-${message}`;
+                const identifier = `${username}-${text}`;
                 const existing = globalDanmus.some(danmu => 
                     `${danmu.username}-${danmu.text}` === identifier
                 );
@@ -1501,6 +1501,7 @@
                     showError('请勿重复发送相同祝福');
                     return;
                 }
+                
                 // 添加加载状态
                 const submitButton = document.getElementById('submitWish');
                 if (submitButton) {
@@ -1509,17 +1510,17 @@
                 }
                 
                 // 保存到本地
-                const newDanmu = saveDanmuToLocal(username, message);
+                const newDanmu = saveDanmuToLocal(username, text);
                 console.log('保存到本地的弹幕:', newDanmu);
 
-                 // 添加到全局弹幕数组
+                // 添加到全局弹幕数组
                 globalDanmus.push(newDanmu);
                 
                 // 只发送这条新弹幕
-                sendDanmu(username, message);
+                sendDanmu(username, text);
                 
                 // 尝试保存到云端
-                await saveDanmuToPublic(username, message);
+                await saveDanmuToPublic(username, text);
                 
                 // 清空输入框
                 nameInput.value = '';
@@ -2146,8 +2147,31 @@
             }
         }
 
+        // 修改祝福卡片渲染函数
+        function addWishToWall(danmu, container) {
+            if (!container) {
+                console.error('Container not found');
+                return;
+            }
+            
+            // 使用弹幕数据属性
+            const username = danmu.username || '匿名用户';
+            const text = danmu.text || '未知祝福';
+            const timestamp = danmu.timestamp ? new Date(danmu.timestamp).toLocaleString() : '未知时间';
+            
+            const wishElement = document.createElement('div');
+            wishElement.className = 'wish-card glassmorphism p-4';
+            wishElement.innerHTML = `
+                <h4 class="font-semibold text-yellow-400 wish-author">${username}</h4>
+                <p class="text-sm mt-2">${text}</p>
+                <div class="text-xs text-gray-500 mt-2">${timestamp}</div>
+            `;
+            
+            container.appendChild(wishElement);
+        }
+
         // 祝福墙功能（整合弹幕功能）
-       function initWishWall() {
+       async function initWishWall() {
             const wishContainer = document.getElementById('wishContainer');
             const moreWishContainer = document.getElementById('moreWishContainer');
             
@@ -2161,24 +2185,22 @@
             moreWishContainer.innerHTML = '';
             
             try {
-                // 获取所有祝福并按时间排序（最新的在前）
-                const danmus = getLocalDanmus();
-                console.log('所有弹幕数据:', danmus);
+                // 复用弹幕系统的云端数据
+                const danmus = await getCombinedDanmus();
+                console.log('弹幕/祝福数据:', danmus);
                 
+                // 按时间排序（最新的在前）
                 allWishes = danmus.sort((a, b) => {
                     const timeA = new Date(a.timestamp || 0);
                     const timeB = new Date(b.timestamp || 0);
                     return timeB - timeA;
                 });
                 
-                console.log('排序后的弹幕数据:', allWishes);
+                console.log('排序后的祝福数据:', allWishes);
                 
                 // 分离初始显示和折叠的祝福
                 const initialWishes = allWishes.slice(0, MAX_INITIAL_WISHES);
                 const collapsedWishes = allWishes.slice(MAX_INITIAL_WISHES);
-                
-                console.log('初始祝福:', initialWishes);
-                console.log('折叠祝福:', collapsedWishes);
                 
                 // 渲染初始祝福
                 initialWishes.forEach(wish => {
@@ -2195,6 +2217,15 @@
             } catch (error) {
                 console.error('初始化祝福墙失败:', error);
                 showError('加载祝福失败');
+                
+                // 后备方案：显示本地弹幕数据
+                const localDanmus = getLocalDanmus();
+                if (localDanmus.length > 0) {
+                    showError('使用本地弹幕数据');
+                    localDanmus.forEach(danmu => {
+                        addWishToWall(danmu, wishContainer);
+                    });
+                }
             }
         }
 
@@ -2390,7 +2421,7 @@
                 
                 // 保存更新后的弹幕数据
                 localStorage.setItem(DANMU_KEY, JSON.stringify(danmus));
-                showError('弹幕已删除');
+                showError('弹幕/祝福已删除');
                 
                 // 更新全局数组
                 globalDanmus = globalDanmus.filter(danmu => danmu.id !== wishId);
