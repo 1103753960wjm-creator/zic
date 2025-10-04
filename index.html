@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -61,6 +62,7 @@
             .wish-card {
                 font-size: 14px;
                 padding: 12px;
+                transform: scale(0.95); /* 移动端缩小少一点 */
             }
             
             .wish-author {
@@ -76,12 +78,105 @@
                 width: 100%;
                 padding: 12px;
             }
+            
+            #wishName, #wishMessage {
+                padding-right: 40px;
+            }
+            
+            .char-counter {
+                font-size: 0.65rem;
+                padding: 0 3px;
+            }
+        }
+
+        /* 音乐播放控制器 */
+        .music-controller {
+            background: rgba(30, 30, 60, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+        }
+
+        .play-button {
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 138, 0, 0.4);
+        }
+
+        .play-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 138, 0, 0.6);
+        }
+
+        /* 进度条容器样式 */
+        .progress-bar {
+            position: relative;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        /* 进度条样式 */
+       .progress {
+            height: 100%;
+            background: linear-gradient(90deg, #ff8a00, #ff0080);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+
+        /* 歌词显示框优化 */
+        .lyrics-header {
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .lyrics-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .close-lyrics {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close-lyrics:hover {
+            color: #ffd700;
+            transform: scale(1.2);
+        }
+
+        .lyrics-content {
+            height: 183px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            padding: 10px;
         }
 
         /* 祝福卡片动画 */
         .wish-card {
+            position: relative; /* 关键：为绝对定位提供参考 */
             transition: all 0.3s ease;
-            transform-origin: center top;
+            cursor: pointer;
+            transform: scale(0.95);
+            transform-origin: center;
+            padding-bottom: 20px; /* 为时间留出空间 */
+        }
+
+        /* 添加时间显示样式 */
+        .wish-time {
+            position: absolute;
+            bottom: 5px;
+            left: 10px;
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.7);
+            z-index: 10; /* 确保在最上层 */
         }
 
         .wish-card.hidden {
@@ -105,16 +200,28 @@
             transform: translateY(-5px);
             box-shadow: 0 12px 28px 0 rgba(255, 215, 0, 0.3);
         }
-
-        /* 祝福卡片悬停效果优化 */
-        .wish-card {
+        
+        /* 内嵌字符计数样式 */
+        .char-counter {
             transition: all 0.3s ease;
-            cursor: pointer;
+            padding: 0 4px;
+            border-radius: 3px;
+            background: rgba(0, 0, 0, 0.3);
         }
 
-        .wish-card:hover {
-            transform: translateY(-5px) rotate(2deg);
-            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.3);
+        .char-counter.warning {
+            background-color: rgba(255, 165, 0, 0.5);
+            color: #ffd700;
+        }
+
+        .char-counter.danger {
+            background-color: rgba(255, 0, 0, 0.5);
+            color: #ff6b6b;
+        }
+
+        /* 输入框样式调整 */
+        #wishName, #wishMessage {
+            padding-right: 45px; /* 为计数留出空间 */
         }
 
         /* 导航链接悬停效果优化 */
@@ -304,22 +411,6 @@
             to { transform: translateX(-100%); }
         }
 
-        /* 高亮文本效果优化 */
-        .highlight-text {
-            position: relative;
-            display: inline-block;
-        }
-        .highlight-text::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 10px;
-            background-color: rgba(255, 215, 0, 0.4);
-            z-index: -1;
-        }
-
         /* 慢速脉冲动画优化 */
         .animate-pulse-slow {
             animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
@@ -401,107 +492,68 @@
             animation: shake 0.5s ease;
         }
         
-        /* 歌词显示框样式优化 */
+        /* 歌词显示框优化 */
         .lyrics-container {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
             width: 90%;
-            max-width: 600px;
-            height: 200px;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
+            max-width: 700px;
+            height: 250px;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
             border-radius: 15px;
             padding: 20px;
             overflow: hidden;
             z-index: 1000;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 215, 0, 0.3);
-            display: none;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            display: none; /* 初始隐藏 */
         }
-        
+
         .lyrics-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+            border-bottom: 2px solid rgba(255, 215, 0, 0.4);
         }
-        
+
         .lyrics-title {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
             color: #ffd700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
         }
-        
+
         .close-lyrics {
             background: none;
             border: none;
             color: #fff;
-            font-size: 20px;
+            font-size: 24px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        
+
         .close-lyrics:hover {
             color: #ffd700;
-            transform: scale(1.2);
+            transform: scale(1.3);
         }
-        
+
         .lyrics-content {
-            height: 130px;
+            height: 180px;
             overflow-y: auto;
-            padding-right: 10px;
-            text-align: center;
-            font-size: 16px;
-            line-height: 1.8;
-        }
-        
-        .lyrics-content::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .lyrics-content::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-        }
-        
-        .lyrics-content::-webkit-scrollbar-thumb {
-            background: rgba(255, 215, 0, 0.5);
-            border-radius: 10px;
-        }
-        
-        .lyrics-line {
-            margin: 8px 0;
-            transition: all 0.3s ease;
-            opacity: 0.7;
-        }
-        
-        .lyrics-line.active {
-            color: #ffd700;
-            font-weight: bold;
+            padding: 15px;
             font-size: 18px;
-            opacity: 1;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            line-height: 2;
         }
-        
-        /* 进度条样式优化 */
-        .progress-container {
-            width: 100%;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            margin-top: 10px;
-            overflow: hidden;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #ff8a00, #ff0080);
-            width: 0%;
-            transition: width 0.1s linear;
+
+        .lyrics-line {
+            margin: 10px 0;
+            padding: 5px 10px;
+            border-radius: 8px;
         }
         
         /* 烟花容器样式 */
@@ -719,7 +771,7 @@
                     <a href="#countdown" class="desktop-nav-link">生日倒计时</a>
                     <a href="#wishes" class="desktop-nav-link">祝福墙</a>
                     <a href="#songs" class="desktop-nav-link">热门歌曲</a>
-                    <a href="#timeline" class="desktop-nav-link">歌手历程</a>
+                    <a href="#timeline" class="desktop-nav-link">歌曲历程</a>
                     <a href="#admin" class="desktop-nav-link">管理</a>
                 </div>
 
@@ -734,7 +786,7 @@
                 <a href="#countdown" class="mobile-nav-link block py-2">生日倒计时</a>
                 <a href="#wishes" class="mobile-nav-link block py-2">祝福墙</a>
                 <a href="#songs" class="mobile-nav-link block py-2">热门歌曲</a>
-                <a href="#timeline" class="mobile-nav-link block py-2">歌手历程</a>
+                <a href="#timeline" class="mobile-nav-link block py-2">歌曲历程</a>
                 <a href="#admin" class="mobile-nav-link block py-2">管理</a>
             </div>
         </nav>
@@ -742,7 +794,7 @@
         <!-- 头部横幅 -->
         <header class="container mx-auto py-16 px-4 md:px-8 relative text-center">
             <h1 class="text-4xl md:text-5xl font-bold mb-6">
-                <span class="highlight-text">冯子晨生日应援</span>
+                <span class="highlight-text">冯子晨生日祝福</span>
             </h1>
             <p class="text-xl md:text-2xl text-gray-300 mb-8">让我们一起为TA送上最好玩的祝福</p>
             <img src="https://p1.music.126.net/v43o97-fG8V6lF7MG2RB_Q==/109951172008963780.jpg?param=180y180" 
@@ -782,13 +834,22 @@
                     <!-- 生日祝福区域 -->
                     <div id="birthdayMessage" class="hidden">
                         <p class="text-xl font-bold text-yellow-400 mb-4">生日快乐！</p>
-                        <audio id="birthdaySong" class="mx-auto">
+                            <!-- 网易云音乐播放器 -->
+                                <div class="music-controller glassmorphism rounded-full p-6 max-w-md mx-auto">
+                                    <div class="player-wrapper">
+                                        <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" 
+                                                width="100%" height="86" 
+                                                src="//music.163.com/outchain/player?type=2&id=1965555401&auto=1&height=66">
+                                        </iframe>
+                                    </div>
+                                </div>
+                                <!-- 添加显示歌词按钮 -->
+                                <button id="showLyricsBtn" class="play-button mt-4">
+                                    <i class="fas fa-music mr-2"></i>显示歌词
+                                        <audio id="birthdaySong" class="mx-auto">
+                                </button>
                             <source src="https://dlink.host/musics/aHR0cHM6Ly9vbmVkcnYtbXkuc2hhcmVwb2ludC5jb20vOnU6L2cvcGVyc29uYWwvc3Rvcl9vbmVkcnZfb25taWNyb3NvZnRfY29tL0VjX2kzSlFLMnR4Rm55Q3NIeG0tZVJBQlRIZkNyN0xNLWs4WjkxOWR2OS1QWFE.wav" type="audio/mpeg">
-                            您的浏览器不支持音频元素。
                         </audio>
-                        <button id="playButton" class="play-button mt-4">
-                            <i class="fas fa-play mr-2"></i>播放生日歌
-                        </button>
                     </div>
                 </div>
             </div>
@@ -808,11 +869,30 @@
                 <div class="mb-8">
                     <h3 class="text-xl font-semibold mb-4">留下你的祝福</h3>
                     <div class="flex flex-col md:flex-row gap-4">
-                        <input type="text" id="wishName" placeholder="你的名字" class="flex-grow p-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500">
-                        <textarea id="wishMessage" placeholder="写下你的祝福..." class="flex-grow p-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500" rows="1"></textarea>
-                        <button id="submitWish" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-lg transition-colors">
-                            <i class="fas fa-paper-plane mr-2"></i>发送祝福
-                        </button>
+                        <!-- 名字输入框 -->
+                        <div class="flex-grow relative">
+                            <input type="text" id="wishName" placeholder="你的名字" 
+                                class="w-full p-3 pr-12 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                maxlength="10">
+                            <div class="absolute right-3 bottom-3 text-xs text-gray-400">
+                                <span id="nameCharCount">0</span>/10
+                            </div>
+                        </div>
+                        <!-- 祝福内容输入框 -->
+                        <div class="flex-grow relative">
+                            <textarea id="wishMessage" placeholder="写下你的祝福..." 
+                                    class="w-full p-3 pr-12 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                    rows="1" maxlength="25"></textarea>
+                            <div class="absolute right-3 bottom-3 text-xs text-gray-400">
+                                <span id="messageCharCount">0</span>/25
+                            </div>
+                        </div>
+                        <!-- 提交按钮 -->
+                        <div>
+                            <button id="submitWish" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-lg transition-colors h-full">
+                                <i class="fas fa-paper-plane mr-2"></i>发送祝福
+                            </button>
+                        </div>
                     </div>
                     <p class="text-sm text-gray-400 mt-2">你的祝福将会在屏幕上飘过，让更多人看到！</p>
                 </div>
@@ -916,14 +996,14 @@
             </div>
         </section>
 
-        <!-- 歌手历程时间线部分 -->
+        <!-- 歌曲历程时间线部分 -->
         <section id="timeline" class="container mx-auto py-12 px-4 md:px-8">
             <div class="glassmorphism p-8">
                 <h2 class="text-3xl font-bold mb-6 flex items-center">
                     <div class="w-10 h-10 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 flex items-center justify-center text-white mr-3">
                         <i class="fas fa-history"></i>
                     </div>
-                    歌手历程
+                    歌曲历程
                 </h2>
 
                 <div class="relative">
@@ -934,8 +1014,9 @@
                     <div class="relative pl-16 pb-8">
                         <div class="timeline-dot absolute left-5 top-9"></div>
                         <div class="glassmorphism p-4 rounded-lg">
-                            <h3 class="text-xl font-semibold text-yellow-400">2018年</h3>
-                            <p class="text-gray-400">参加《明日之星》选秀节目，获得全国总冠军</p>
+                            <h3 class="text-xl font-semibold text-yellow-400">半山腰</h3>
+                            <p class="text-gray-400">发行时间：2022-07-22</p>
+                            <p class="text-gray-400">播放次数：50万</p>                                                    
                         </div>
                     </div>
 
@@ -1035,6 +1116,13 @@
                     <button id="clearLocal" class="btn-danger ml-2">
                         <i class="fas fa-trash-alt mr-2"></i>清空本地数据
                     </button>
+                    <!-- 在admin-panel内添加 -->
+                    <div class="mt-4">
+                        <button id="cleanExpiredBtn" class="btn-secondary">
+                            <i class="fas fa-trash-alt mr-2"></i>清理过期弹幕
+                        </button>
+                        <span id="cleanupStatus" class="text-sm text-gray-400 ml-2"></span>
+                    </div>
                 </div>
                 
                 <div id="wish-list" class="mt-6">
@@ -1059,7 +1147,7 @@
         <!-- 页脚 -->
         <footer class="bg-blue-900 text-white py-8 mt-12">
             <div class="container mx-auto px-4 text-center">
-                <p>© 2025 冯子晨生日应援网站</p>
+                <p>© 2025 冯子晨生日祝福应援网站</p>
                 <p class="mt-2 text-blue-200">created by kkchan</a></p>
                 <p class="text-sm text-blue-300 mt-2">页面内容版权归制作方所有，请勿侵权</p>
             </div>
@@ -1075,19 +1163,60 @@
     <!-- 弹幕容器 -->
     <div id="danmuContainer" class="danmu-container"></div>
     
-    <!-- 歌词显示框 -->
+    <!-- 静态歌词显示框 -->
     <div id="lyricsContainer" class="lyrics-container">
-        <div class="lyrics-header">
-            <div class="lyrics-title">生日歌歌词</div>
+        <div class="lyrics-header flex justify-between items-center mb-3">
+            <div class="lyrics-title">星光不落 - AI & KKchan</div>
             <button id="closeLyrics" class="close-lyrics">
                 <i class="fas fa-times"></i>
             </button>
         </div>
         <div class="lyrics-content" id="lyricsContent">
-            <!-- 歌词将通过JavaScript动态填充 -->
-        </div>
-        <div class="progress-container">
-            <div class="progress-bar" id="progressBar"></div>
+            <!-- 静态歌词内容 -->
+            <p>不过是追光的人 怎么嘲笑顶峰的神</p>
+            <p>这世界最不缺的就是天分</p>
+            <p>不过是舞台浮沉 不过是岁月无痕</p>
+            <p>你向往的远方不必多问</p>
+            <p>曾经你台下无人 曾经你歌声青涩</p>
+            <p>现在都成为你荣耀的资本</p>
+            <p>跟着你大喝一声 定乾坤</p>
+            <p>共赴山顶 破山门</p>
+            <p>不过是 半山腰 怎敢与 天争高</p>
+            <p>这乐坛 英雄 有多少</p>
+            <p>眼一闭 心狂跳 你一唱 破九霄</p>
+            <p>惊起千层 追随的潮</p>
+            <p>你行至 半山腰 将音乐 当作庙</p>
+            <p>仍怀着 谦逊的心 来讨教</p>
+            <p>艺术的 路遥遥 更高的 境难料</p>
+            <p>到巅峰 再笑览 众山小</p>
+            <p>不过是追光的人 怎么嘲笑顶峰的神</p>
+            <p>这世界最不缺的就是天分</p>
+            <p>不过是舞台浮沉 不过是岁月无痕</p>
+            <p>你向往的远方不必多问</p>
+            <p>曾经你台下无人 曾经你歌声青涩</p>
+            <p>现在都成为你荣耀的资本</p>
+            <p>跟着你大喝一声 定乾坤</p>
+            <p>共赴山顶破山门</p>
+            <p>不过是 半山腰 怎敢与 天争高</p>
+            <p>这乐坛 英雄 有多少</p>
+            <p>眼一闭 心狂跳 你一唱 破九霄</p>
+            <p>惊起千层 追随的潮</p>
+            <p>你行至 半山腰 将音乐 当作庙</p>
+            <p>仍怀着 谦逊的心 来讨教</p>
+            <p>艺术的 路遥遥 更高的 境难料</p>
+            <p>到巅峰 再笑览 众山小</p>
+            <p>半山腰 天争高</p>
+            <p>星海 正翻潮</p>
+            <p>心狂跳 破九霄</p>
+            <p>千层 追随的潮</p>
+            <p>你行至 半山腰 将音乐 当作庙</p>
+            <p>仍怀着 谦逊的心 来讨教</p>
+            <p>艺术的 路遥遥 更高的 境难料</p>
+            <p>到巅峰 再笑览 众山小</p>
+            <p>生日快乐 我的英雄</p>
+            <p>这一路 有你 也有我</p>
+            <p>待登顶 再同唱 这首歌</p>
+            <p>新程再启 星光不落</p>
         </div>
     </div>
 
@@ -1099,7 +1228,7 @@
             
         // 添加管理员密码常量
         const DANMU_KEY = 'fengzichen_danmu_data';
-        const ADMIN_PASSWORD = "admin123";
+        const ADMIN_PASSWORD = "12030919wjm";
         let globalDanmus = []; // 全局弹幕数组
 
         // 获取管理面板相关元素
@@ -1117,7 +1246,8 @@
         let allWishes = [];
         let isExpanded = false;
         const MAX_INITIAL_WISHES = 9;
-
+        // 在顶部常量区域添加
+        const DANMU_EXPIRATION_DAYS = 10; // 弹幕保存10天
 
         // 初始化LeanCloud
         AV.init({
@@ -1199,16 +1329,27 @@
             const localData = localStorage.getItem(DANMU_KEY);
             const danmus = localData ? JSON.parse(localData) : [];
             
-            // 添加调试信息
-            console.log('本地弹幕数据:', danmus);
+            // 添加过期弹幕过滤
+            const now = Date.now();
+            const validDanmus = danmus.filter(danmu => {
+                // 如果弹幕没有过期时间，默认不过期
+                if (!danmu.expires) return true;
+                return danmu.expires > now;
+            });
+            
+            // 如果有过期弹幕被移除，更新本地存储
+            if (validDanmus.length < danmus.length) {
+                localStorage.setItem(DANMU_KEY, JSON.stringify(validDanmus));
+            }
             
             // 确保每个弹幕对象都有必要的属性
-            return danmus.map(danmu => {
+            return validDanmus.map(danmu => {
                 return {
                     id: danmu.id || Date.now(),
                     username: danmu.username || '匿名用户',
                     text: danmu.text || '未知祝福',
                     timestamp: danmu.timestamp || new Date().toISOString(),
+                    expires: danmu.expires || Date.now() + (DANMU_EXPIRATION_DAYS * 24 * 60 * 60 * 1000),
                     objectId: danmu.objectId || null
                 };
             });
@@ -1233,13 +1374,36 @@
                 id: Date.now(),
                 username: username || '匿名用户',
                 text: text || '未知祝福',
-                timestamp: new Date().toISOString(),
+                timestamp: new Date().toISOString(), // 添加当前时间
+                expires: Date.now() + (DANMU_EXPIRATION_DAYS * 24 * 60 * 60 * 1000), // 添加过期时间
                 objectId: objectId
             };
             
             danmus.push(newDanmu);
             localStorage.setItem(DANMU_KEY, JSON.stringify(danmus));
             return newDanmu;
+        }
+
+        // 定期清理过期弹幕（每24小时执行一次）
+        function scheduleDanmuCleanup() {
+            // 每天凌晨3点执行清理
+            const now = new Date();
+            const cleanupTime = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate() + 1, // 明天
+                3, 0, 0 // 凌晨3点
+            );
+            
+            const timeUntilCleanup = cleanupTime - now;
+            
+            setTimeout(() => {
+                // 执行清理
+                getLocalDanmus(); // 调用getLocalDanmus会自动清理过期弹幕
+                
+                // 安排下一次清理
+                scheduleDanmuCleanup();
+            }, timeUntilCleanup);
         }
 
          // 修复点6：增强从云端获取弹幕的函数
@@ -1412,31 +1576,7 @@
                         }
                     }
                 }
-            }, 3000); // 每3秒发送一条
-        }
-
-        
-        // 添加祝福到祝福墙
-        function addWishToWall(wish, container) {
-            if (!container) {
-                console.error('Container not found');
-                return;
-            }
-            
-            // 确保有必要的属性
-            const username = wish.username || '匿名用户';
-            const text = wish.text || '未知祝福';
-            const timestamp = wish.timestamp ? new Date(wish.timestamp).toLocaleTimeString() : '未知时间';
-            
-            const wishElement = document.createElement('div');
-            wishElement.className = 'wish-card glassmorphism p-4';
-            wishElement.innerHTML = `
-                <h4 class="font-semibold text-yellow-400 wish-author">${username}</h4>
-                <p class="text-sm mt-2">${text}</p>
-                <div class="text-xs text-gray-500 mt-2">${timestamp}</div>
-            `;
-            
-            container.appendChild(wishElement);
+            }, 5000); // 每5秒发送一条
         }
 
         // 添加折叠/展开功能
@@ -1618,7 +1758,15 @@
             if (!container) return;
             
             container.innerHTML = '';
-            const danmus = getLocalDanmus();
+            // 获取弹幕数据
+            let danmus = getLocalDanmus();
+            
+            // 按时间戳倒序排列（最新的在前）
+            danmus.sort((a, b) => {
+                const timeA = new Date(a.timestamp).getTime();
+                const timeB = new Date(b.timestamp).getTime();
+                return timeB - timeA; // 倒序排列
+            });
             
             if (danmus.length === 0) {
                 container.innerHTML = '<p class="text-center py-4 text-gray-400">暂无弹幕</p>';
@@ -1748,6 +1896,7 @@
             
             const ctx = canvas.getContext('2d');
             const fireworks = [];
+            let animationId; // 存储动画帧ID
             
             function createFirework(x, y) {
                 const particles = [];
@@ -1811,43 +1960,29 @@
                     }
                 }
                 
-                requestAnimationFrame(animate);
+                animationId = requestAnimationFrame(animate);
             }
             
+            // 启动动画
             animate();
+            
+            // 60秒后停止烟花
+            setTimeout(() => {
+                // 停止动画
+                cancelAnimationFrame(animationId);
+                
+                // 隐藏烟花容器
+                container.style.display = 'none';
+                
+                // 移除canvas元素
+                if (canvas.parentNode) {
+                    canvas.parentNode.removeChild(canvas);
+                }
+                
+                // 重置烟花状态
+                fireworksStarted = false;
+            }, 60000); // 60秒 = 60000毫秒
         }
-        
-        // 歌词数据
-        const lyrics = [
-            {type: "section", text: "[Verse]"},
-            {text: "不过是最初的我们 守着屏幕那盏灯"},
-            {text: "这世界最珍贵的不是天分"},
-            {text: "是你歌声里的真 是我们相伴的程"},
-            {text: "从几人到千万 故事不必多问"},
-            {type: "section", text: "[Verse]"},
-            {text: "曾经你吉他轻弹 曾经我们孤单相伴"},
-            {text: "现在都成为你闪耀的资本"},
-            {text: "跟着你大喝一声 定乾坤"},
-            {text: "新岁再攀更高峰"},
-            {type: "section", text: "[Chorus]"},
-            {text: "不过是 半山腰 怎敢与 天争高"},
-            {text: "这一路 星潮 有多少"},
-            {text: "眼一闭 心狂跳 你一跃 万丈高"},
-            {text: "我们在 山脚 为你叫好"},
-            {type: "section", text: "[Bridge]"},
-            {text: "从青涩到今朝 从地下到舞台中央"},
-            {text: "每首歌 都是我们的勋章"},
-            {text: "生日快乐歌 此刻为你唱"},
-            {text: "新程在脚下 共赴下一程"},
-            {type: "section", text: "[Outro]"},
-            {text: "生日快乐 我的英雄"},
-            {text: "这一路 有你 有我"},
-            {text: "到山顶 再共唱这首歌"},
-            {text: "新程再启 星光不落"}
-        ];
-        
-        // 当前高亮歌词索引
-        let currentLyricIndex = 0;
         
         // 显示错误消息
         function showError(message) {
@@ -1860,85 +1995,6 @@
             setTimeout(() => {
                 errorEl.classList.remove('show');
             }, 3000);
-        }
-        
-        // 初始化歌词显示
-        function initLyrics() {
-            const lyricsContent = document.getElementById('lyricsContent');
-            if (!lyricsContent) return;
-            
-            lyricsContent.innerHTML = '';
-            
-            lyrics.forEach((line, index) => {
-                let lineElement = document.createElement('div');
-                
-                if (line.type === "section") {
-                    lineElement.className = 'lyrics-section';
-                    lineElement.textContent = line.text;
-                } else {
-                    lineElement.className = 'lyrics-line';
-                    lineElement.textContent = line.text;
-                    lineElement.dataset.index = index;
-                }
-                
-                lyricsContent.appendChild(lineElement);
-            });
-        }
-        
-        // 更新歌词高亮
-        function updateLyricsHighlight() {
-            const lyricsLines = document.querySelectorAll('.lyrics-line');
-            
-            // 移除所有高亮
-            lyricsLines.forEach(line => {
-                line.classList.remove('active');
-            });
-            
-            // 高亮当前行
-            if (lyricsLines[currentLyricIndex]) {
-                lyricsLines[currentLyricIndex].classList.add('active');
-                
-                // 滚动到当前行
-                lyricsLines[currentLyricIndex].scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'center'
-                });
-            }
-        }
-        
-        // 更新歌词进度
-        function updateLyricsProgress() {
-            if (!birthdayAudio) return;
-            
-            // 计算当前播放进度
-            const progress = (birthdayAudio.currentTime / birthdayAudio.duration) * 100;
-            const progressBar = document.getElementById('progressBar');
-            if (progressBar) {
-                progressBar.style.width = `${progress}%`;
-            }
-            
-            // 更新歌词高亮
-            const totalLyrics = lyrics.filter(line => !line.type).length;
-            const lyricProgress = Math.floor((birthdayAudio.currentTime / birthdayAudio.duration) * totalLyrics);
-            
-            // 找到下一个歌词索引
-            let lyricIndex = 0;
-            let count = 0;
-            
-            for (let i = 0; i < lyrics.length; i++) {
-                if (!lyrics[i].type) {
-                    if (count === lyricProgress) {
-                        lyricIndex = i;
-                        break;
-                    }
-                    count++;
-                }
-            }
-            
-            if (currentLyricIndex !== lyricIndex) {
-                currentLyricIndex = lyricIndex;
-                updateLyricsHighlight();
-            }
         }
         
         // 初始化移动端菜单功能
@@ -2004,31 +2060,16 @@
             }
             
             function openGift() {
+                
                 if (overlay) overlay.classList.add('hidden');
-                
-                // 初始化音频元素
-                birthdayAudio = document.getElementById('birthdaySong');
-                
-                // 预加载音频
-                if (birthdayAudio) {
-                    birthdayAudio.load();
-                    audioInitialized = true;
-                    
-                    // 添加错误处理
-                    birthdayAudio.addEventListener('error', function() {
-                        showError('音频加载失败，请刷新页面重试');
-                    });
-                }
-                
-                // 初始化歌词
-                initLyrics();
-                
+        
+                // 显示提示而不是自动播放
+                showError('surprise~！');
+        
                 setTimeout(() => {
-                    if (websiteContent) websiteContent.classList.add('visible');
-                    
+                    if (websiteContent) websiteContent.classList.add('visible');              
                     // 初始化祝福墙
-                    initWishWall();
-                    
+                    initWishWall();                   
                     // 初始化烟花特效
                     initFireworks();
                 }, 400);
@@ -2090,61 +2131,6 @@
             // 显示播放按钮
             const playButton = document.getElementById('playButton');
             if (playButton) playButton.style.display = 'block';
-        }
-
-        // 播放生日歌
-        function initPlayButton() {
-            const playButton = document.getElementById('playButton');
-            if (playButton) {
-                playButton.addEventListener('click', function() {
-                    if (!audioInitialized) return;
-                    
-                    if (birthdayAudio) {
-                        // 显示歌词框
-                        const lyricsContainer = document.getElementById('lyricsContainer');
-                        if (lyricsContainer) lyricsContainer.style.display = 'block';
-                        lyricsVisible = true;
-                        
-                        // 尝试播放音频
-                        birthdayAudio.play().then(() => {
-                            this.style.display = 'none';
-                            
-                            // 开始更新歌词进度
-                            birthdayAudio.addEventListener('timeupdate', updateLyricsProgress);
-                            
-                            // 歌曲结束时重置
-                            birthdayAudio.addEventListener('ended', function() {
-                                if (playButton) playButton.style.display = 'block';
-                                currentLyricIndex = 0;
-                                updateLyricsHighlight();
-                                const progressBar = document.getElementById('progressBar');
-                                if (progressBar) progressBar.style.width = '0%';
-                            });
-                        }).catch(error => {
-                            showError('播放失败，请检查音频链接是否有效');
-                        });
-                    }
-                });
-            }
-        }
-
-        // 关闭歌词框
-        function initCloseLyricsButton() {
-            const closeLyrics = document.getElementById('closeLyrics');
-            if (closeLyrics) {
-                closeLyrics.addEventListener('click', function() {
-                    const lyricsContainer = document.getElementById('lyricsContainer');
-                    if (lyricsContainer) lyricsContainer.style.display = 'none';
-                    lyricsVisible = false;
-                    
-                    // 暂停音频
-                    if (birthdayAudio) {
-                        birthdayAudio.pause();
-                        const playButton = document.getElementById('playButton');
-                        if (playButton) playButton.style.display = 'block';
-                    }
-                });
-            }
         }
 
         // 修改祝福卡片渲染函数
@@ -2249,26 +2235,113 @@
 
         // 只保留这个版本的addWishToWall函数
         function addWishToWall(wish, container) {
-            if (!container) {
-                console.error('Container not found');
-                return;
-            }
+            if (!container) return;
             
-            // 确保使用正确的属性名
             const username = wish.username || '匿名用户';
             const text = wish.text || '未知祝福';
-            const timestamp = wish.timestamp ? new Date(wish.timestamp).toLocaleTimeString() : '未知时间';
+            
+            // 确保时间戳存在
+            const timestamp = wish.timestamp || new Date().toISOString();
             
             const wishElement = document.createElement('div');
             wishElement.className = 'wish-card glassmorphism p-4';
             wishElement.innerHTML = `
                 <h4 class="font-semibold text-yellow-400 wish-author">${username}</h4>
                 <p class="text-sm mt-2">${text}</p>
-                <div class="text-xs text-gray-500 mt-2">${timestamp}</div>
+                <div class="text-xs text-gray-500 mt-2">${new Date(timestamp).toLocaleString()}</div>
             `;
             
+            // 创建时间元素
+            const timeElement = document.createElement('div');
+            timeElement.className = 'wish-time';
+            
+            try {
+                const wishDate = new Date(timestamp);
+                if (isNaN(wishDate.getTime())) {
+                    timeElement.textContent = "未知时间";
+                } else {
+                    // 获取月份（0-11，需要+1）
+                    const month = (wishDate.getMonth() + 1).toString().padStart(2, '0');
+                    // 获取日期
+                    const day = wishDate.getDate().toString().padStart(2, '0');
+                    // 获取小时
+                    const hours = wishDate.getHours().toString().padStart(2, '0');
+                    // 获取分钟
+                    const minutes = wishDate.getMinutes().toString().padStart(2, '0');
+                    
+                    // 组合成 "月-日 时:分" 格式
+                    timeElement.textContent = `${month}-${day} ${hours}:${minutes}`;
+                }
+            } catch (e) {
+                console.error('时间格式化错误:', e);
+                timeElement.textContent = "未知时间";
+            }
+            
+            wishElement.appendChild(timeElement);
             container.appendChild(wishElement);
         }
+
+        // 初始化字符计数功能
+        function initCharCounters() {
+            const nameInput = document.getElementById('wishName');
+            const messageInput = document.getElementById('wishMessage');
+            const nameCounter = document.getElementById('nameCharCount');
+            const messageCounter = document.getElementById('messageCharCount');
+            
+            if (!nameInput || !messageInput || !nameCounter || !messageCounter) return;
+            
+            // 更新计数显示函数
+            function updateCounter(input, counter, maxLength) {
+                const currentLength = input.value.length;
+                counter.textContent = currentLength;
+                
+                // 移除所有样式类
+                counter.className = 'char-counter';
+                
+                // 根据长度添加样式
+                if (currentLength >= maxLength) {
+                    counter.classList.add('danger');
+                } else if (currentLength >= maxLength * 0.8) {
+                    counter.classList.add('warning');
+                }
+            }
+            
+            // 名字输入框事件监听
+            nameInput.addEventListener('input', function() {
+                updateCounter(this, nameCounter, 10);
+            });
+            
+            // 祝福内容输入框事件监听
+            messageInput.addEventListener('input', function() {
+                updateCounter(this, messageCounter, 25);
+            });
+            
+            // 初始化计数显示
+            updateCounter(nameInput, nameCounter, 10);
+            updateCounter(messageInput, messageCounter, 25);
+            
+            // 添加焦点事件，让计数更明显
+            nameInput.addEventListener('focus', function() {
+                nameCounter.parentElement.style.opacity = '1';
+            });
+            
+            nameInput.addEventListener('blur', function() {
+                if (this.value.length === 0) {
+                    nameCounter.parentElement.style.opacity = '0.5';
+                }
+            });
+            
+            messageInput.addEventListener('focus', function() {
+                messageCounter.parentElement.style.opacity = '1';
+            });
+            
+            messageInput.addEventListener('blur', function() {
+                if (this.value.length === 0) {
+                    messageCounter.parentElement.style.opacity = '0.5';
+                }
+            });
+        }
+
                 
         // 定时发送弹幕（带密度控制）
         function startDanmu() {
@@ -2324,46 +2397,6 @@
                             }
                         }
                     }
-                });
-            });
-        }
-
-        // 修复渲染函数
-        function renderAdminWishes() {
-            const container = document.getElementById('admin-wish-container');
-            if (!container) return;
-            
-            container.innerHTML = '';
-            const danmus = getLocalDanmus();
-            
-            if (danmus.length === 0) {
-                container.innerHTML = '<p class="text-center py-4 text-gray-400">暂无弹幕</p>';
-                return;
-            }
-            
-            danmus.forEach(danmu => {
-                const danmuElement = document.createElement('div');
-                danmuElement.className = 'wish-item';
-                danmuElement.innerHTML = `
-                    <div class="wish-content">
-                        <div class="wish-author">${danmu.username}</div>
-                        <div class="wish-text">${danmu.text}</div>
-                        <div class="text-xs text-gray-400">${new Date(danmu.timestamp).toLocaleString()}</div>
-                    </div>
-                    <div class="admin-controls">
-                        <button class="btn-danger delete-btn" data-id="${danmu.id}">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                `;
-                container.appendChild(danmuElement);
-            });
-            
-            // 添加删除事件监听器
-            document.querySelectorAll('.delete-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const danmuId = this.getAttribute('data-id');
-                    deleteWish(danmuId);
                 });
             });
         }
@@ -2644,12 +2677,12 @@
             
             // 初始化礼物盒交互
             initGiftInteraction();
-            
-            // 初始化播放按钮
-            initPlayButton();
 
             // 页面加载时初始化弹幕
             initDanmu();
+
+            // 启动定期清理
+            scheduleDanmuCleanup();
 
             // 监听页面刷新事件
             window.addEventListener('beforeunload', function() {
@@ -2657,8 +2690,6 @@
                 const danmuContainer = document.getElementById('danmuContainer');
                 if (danmuContainer) danmuContainer.innerHTML = '';
             });
-            // 初始化关闭歌词按钮
-            initCloseLyricsButton();
 
             // 确保 DOM 元素存在后再调用
             if (document.getElementById('days') && 
@@ -2671,13 +2702,24 @@
                 updateCountdown();
             } else {
                 console.error('倒计时元素未找到');
-            }
-            
+            }    
 
             // 设置祝福展开功能
             setupWishExpansion();
             
             // 添加祝福事件监听
+            document.getElementById('cleanExpiredBtn').addEventListener('click', function() {
+                const beforeCount = getLocalDanmus().length;
+                getLocalDanmus(); // 调用会自动清理
+                const afterCount = getLocalDanmus().length;
+                
+                const cleanedCount = beforeCount - afterCount;
+                document.getElementById('cleanupStatus').textContent = 
+                    `已清理 ${cleanedCount} 条过期弹幕`;
+                
+                // 刷新弹幕列表
+                renderAdminWishes();
+            });
             const submitWishButton = document.getElementById('submitWish');
             if (submitWishButton) {
                 submitWishButton.addEventListener('click', submitWish);
@@ -2703,7 +2745,7 @@
             if (clearAllBtn) {
                 clearAllBtn.addEventListener('click', clearAllWishes);
             }
-            
+
             // 导航链接点击事件
             document.querySelectorAll('a[href="#admin"]').forEach(link => {
                 link.addEventListener('click', function(e) {
@@ -2712,6 +2754,25 @@
                     document.getElementById('admin').scrollIntoView({ behavior: 'smooth' });
                 });
             });
+
+            // 歌词显示按钮事件
+            const showLyricsBtn = document.getElementById('showLyricsBtn');
+            const lyricsContainer = document.getElementById('lyricsContainer');
+            const closeLyricsBtn = document.getElementById('closeLyrics');
+            
+            if (showLyricsBtn && lyricsContainer) {
+                showLyricsBtn.addEventListener('click', function() {
+                    lyricsContainer.style.display = 'block';
+                });
+            }
+            
+            if (closeLyricsBtn && lyricsContainer) {
+                closeLyricsBtn.addEventListener('click', function() {
+                    lyricsContainer.style.display = 'none';
+                });
+            }
+
+            initCharCounters();
             
             // 关闭管理面板按钮
             document.getElementById('close-admin-btn').addEventListener('click', function() {
@@ -2725,6 +2786,36 @@
                     if (e.key === 'Enter') {
                         submitWish();
                     }
+                });
+            }
+
+            // 添加表单提交验证
+            const submitButton = document.getElementById('submitWish');
+            if (submitButton) {
+                submitButton.addEventListener('click', function(e) {
+                    const nameInput = document.getElementById('wishName');
+                    const messageInput = document.getElementById('wishMessage');
+                    
+                    if (!nameInput || !messageInput) return;
+                    
+                    // 验证名字长度
+                    if (nameInput.value.trim().length > 10) {
+                        showError('名字不能超过10个字符');
+                        nameInput.focus();
+                        e.preventDefault();
+                        return;
+                    }
+                    
+                    // 验证消息长度
+                    if (messageInput.value.trim().length > 25) {
+                        showError('祝福内容不能超过25个字符');
+                        messageInput.focus();
+                        e.preventDefault();
+                        return;
+                    }
+                    
+                    // 如果验证通过，继续提交
+                    submitWish();
                 });
             }
             
