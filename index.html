@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -111,20 +110,135 @@
         .progress-bar {
             position: relative;
             height: 6px;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.2); /* 确保背景可见 */
             border-radius: 3px;
             overflow: hidden;
+            cursor: pointer;
             margin-bottom: 5px;
         }
 
         /* 进度条样式 */
-       .progress {
+       .progress-container {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .progress {
             height: 100%;
             background: linear-gradient(90deg, #ff8a00, #ff0080);
             width: 0%;
             transition: width 0.1s linear;
         }
+        /* 自定义音频播放器样式 */
+        .custom-audio-player {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
+        .album-cover {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 3px solid rgba(255, 215, 0, 0.5);
+        }
+
+        .album-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .playing .album-cover img {
+            animation: rotateAlbum 20s linear infinite;
+        }
+
+        @keyframes rotateAlbum {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .control-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: #ffd700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .control-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255, 215, 0, 0.2);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .play-btn {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ff8a00, #ff0080);
+            color: white;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 138, 0, 0.4);
+        }
+
+        .play-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 138, 0, 0.6);
+        }
+
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .volume-control input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .volume-control input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #ffd700;
+            cursor: pointer;
+            box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+        }
 
         /* 歌词显示框优化 */
         .lyrics-header {
@@ -771,8 +885,8 @@
                     <a href="#countdown" class="desktop-nav-link">生日倒计时</a>
                     <a href="#wishes" class="desktop-nav-link">祝福墙</a>
                     <a href="#songs" class="desktop-nav-link">热门歌曲</a>
-                    <a href="#timeline" class="desktop-nav-link">歌曲历程</a>
-                    <a href="#admin" class="desktop-nav-link">管理</a>
+                    <a href="#timeline" class="desktop-nav-link">歌手历程</a>
+                    <!-- <a href="#admin" class="desktop-nav-link">管理</a> -->
                 </div>
 
                 <!-- 移动端菜单按钮 -->
@@ -786,8 +900,8 @@
                 <a href="#countdown" class="mobile-nav-link block py-2">生日倒计时</a>
                 <a href="#wishes" class="mobile-nav-link block py-2">祝福墙</a>
                 <a href="#songs" class="mobile-nav-link block py-2">热门歌曲</a>
-                <a href="#timeline" class="mobile-nav-link block py-2">歌曲历程</a>
-                <a href="#admin" class="mobile-nav-link block py-2">管理</a>
+                <a href="#timeline" class="mobile-nav-link block py-2">歌手历程</a>
+                <!-- <a href="#admin" class="mobile-nav-link block py-2">管理</a> -->
             </div>
         </nav>
 
@@ -834,13 +948,53 @@
                     <!-- 生日祝福区域 -->
                     <div id="birthdayMessage" class="hidden">
                         <p class="text-xl font-bold text-yellow-400 mb-4">生日快乐！</p>
-                            <!-- 网易云音乐播放器 -->
-                                <div class="music-controller glassmorphism rounded-full p-6 max-w-md mx-auto">
-                                    <div class="player-wrapper">
-                                        <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" 
-                                                width="100%" height="86" 
-                                                src="//music.163.com/outchain/player?type=2&id=1965555401&auto=1&height=66">
-                                        </iframe>
+                                <!-- 音乐播放器 -->
+                                <div class="music-controller glassmorphism rounded-lg p-6 max-w-md mx-auto">
+                                    <div class="custom-audio-player">
+                                        <!-- 专辑封面 -->
+                                        <div class="album-cover mb-4">
+                                            <img src="https://p9-official-plugin-sign.byteimg.com/tos-cn-i-5jbd59dj06/e57bd4bb48b44cffa635fb3ebb2b0278~tplv-5jbd59dj06-compress:q80.image?lk3s=8c875d0b&x-expires=1790519110&x-signature=1tuCrFZj5ukHR6DRouu0an3ZaXw%3D" 
+                                                alt="生日专辑封面" class="w-32 h-32 rounded-full object-cover border-4 border-yellow-500 shadow-lg shadow-yellow-500/30 mx-auto lazy-image">
+                                        </div>
+                                        
+                                        <!-- 歌曲信息 -->
+                                        <div class="song-info text-center mb-4">
+                                            <h3 class="text-xl font-bold text-yellow-400">星光不落</h3>
+                                            <p class="text-gray-400">AI & KKchan</p>
+                                        </div>
+                                        
+                                        <!-- 播放控制 -->
+                                        <div class="player-controls flex justify-center items-center gap-4 mb-4">
+                                            <button id="playPauseBtn" class="play-btn">
+                                                <i class="fas fa-play"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- 进度条和时间显示 -->
+                                        <div class="progress-container mb-2">
+                                            <!-- 进度条容器 -->
+                                            <div class="progress-bar w-full h-2 bg-gray-700 rounded-full">
+                                                <!-- 进度条元素 -->
+                                                <div class="progress h-full bg-gradient-to-r from-yellow-400 to-yellow-600 rounded-full" id="progress" style="width: 0%"></div>
+                                            </div>
+                                            <div class="time-display flex justify-between text-sm text-gray-400">
+                                                <span id="currentTime">0:00</span>
+                                                <span id="duration">0:00</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- 时间显示
+                                        <div class="time-display flex justify-between text-sm text-gray-400 mb-4">
+                                            <span id="currentTime">0:00</span>
+                                            <span id="currentTime">--</span>
+                                            <span id="duration">0:00</span>
+                                        </div> -->
+                                        
+                                        <!-- 音量控制 -->
+                                        <div class="volume-control flex items-center gap-2">
+                                            <i class="fas fa-volume-up text-yellow-400"></i>
+                                            <input type="range" id="volumeSlider" min="0" max="1" step="0.1" value="0.7" class="w-full">
+                                        </div>
                                     </div>
                                 </div>
                                 <!-- 添加显示歌词按钮 -->
@@ -996,14 +1150,14 @@
             </div>
         </section>
 
-        <!-- 歌曲历程时间线部分 -->
+        <!-- 歌手历程时间线部分 -->
         <section id="timeline" class="container mx-auto py-12 px-4 md:px-8">
             <div class="glassmorphism p-8">
                 <h2 class="text-3xl font-bold mb-6 flex items-center">
                     <div class="w-10 h-10 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 flex items-center justify-center text-white mr-3">
                         <i class="fas fa-history"></i>
                     </div>
-                    歌曲历程
+                    歌手历程
                 </h2>
 
                 <div class="relative">
@@ -1014,41 +1168,41 @@
                     <div class="relative pl-16 pb-8">
                         <div class="timeline-dot absolute left-5 top-9"></div>
                         <div class="glassmorphism p-4 rounded-lg">
-                            <h3 class="text-xl font-semibold text-yellow-400">半山腰</h3>
-                            <p class="text-gray-400">发行时间：2022-07-22</p>
-                            <p class="text-gray-400">播放次数：50万</p>                                                    
+                            <h3 class="text-xl font-semibold text-yellow-400">2023-往后</h3>
+                            <p class="text-gray-400">未来规划与展望：计划创作大气的古风歌曲，并希望坚守音乐行业。</p>                                                  
                         </div>
                     </div>
 
                     <div class="relative pl-16 pb-8">
                         <div class="timeline-dot absolute left-5 top-9"></div>
                         <div class="glassmorphism p-4 rounded-lg">
-                            <h3 class="text-xl font-semibold text-yellow-400">2019年</h3>
-                            <p class="text-gray-400">发行首张个人EP《初光》，销量突破百万</p>
+                            <h3 class="text-xl font-semibold text-yellow-400">2023年</h3>
+                            <p class="text-gray-400">风格拓宽与情感沉淀：音乐主题转向家乡与人生态度，发布《弯弯》等作品。</p>
                         </div>
                     </div>
 
                     <div class="relative pl-16 pb-8">
                         <div class="timeline-dot absolute left-5 top-9"></div>
                         <div class="glassmorphism p-4 rounded-lg">
-                            <h3 class="text-xl font-semibold text-yellow-400">2020年</h3>
-                            <p class="text-gray-400">举办首次个人巡回演唱会"星光之旅"</p>
+                            <h3 class="text-xl font-semibold text-yellow-400">2022年</h3>
+                            <p class="text-gray-400">代表作诞生与风波：这一年，冯子晨创作并发布了后来成为他代表作的歌曲——《半山腰》。这首歌倾注了他大量心血，编曲和制作用了大约半年时间。歌曲旨在鼓励大家跨过舒适圈，寻找自己的更高峰，后被广泛用于各类励志视频，充满正能量。
+然而，这首歌的成功也带来了考验。歌曲发布后，他被不少网友指责抄袭某一动漫主题曲，遭遇了"前所未有的网络暴力"。在朋友鼓励和平台帮助下，他最终通过发布澄清视频，用一系列证据证明了自己的清白。这一事件也让他呼吁大家对待原创音乐能"多一些包容和理解"。</p>
                         </div>
                     </div>
 
                     <div class="relative pl-16 pb-8">
                         <div class="timeline-dot absolute left-5 top-9"></div>
                         <div class="glassmorphism p-4 rounded-lg">
-                            <h3 class="text-xl font-semibold text-yellow-400">2021年</h3>
-                            <p class="text-gray-400">获得年度最佳流行歌手奖</p>
+                            <h3 class="text-xl font-semibold text-yellow-400">2018年</h3>
+                            <p class="text-gray-400">组建团队与起步：大学毕业后组建团队运营抖音，开始"小火出圈"。</p>
                         </div>
                     </div>
 
                     <div class="relative pl-16">
                         <div class="timeline-dot absolute left-5 top-9"></div>
                         <div class="glassmorphism p-4 rounded-lg">
-                            <h3 class="text-xl font-semibold text-yellow-400">2022年</h3>
-                            <p class="text-gray-400">发行第二张专辑《追梦人》，全球销量突破500万</p>
+                            <h3 class="text-xl font-semibold text-yellow-400">2017年</h3>
+                            <p class="text-gray-400">大学时期初入行：通过发布短视频和直播开启音乐之路。</p>
                         </div>
                     </div>
                 </div>
@@ -1062,30 +1216,13 @@
             <button id="close-admin-btn" class="close-admin-btn">
             <i class="fas fa-times"></i>
             </button>
-            
-            <h2 class="text-3xl font-bold mb-6 flex items-center">
-                <div class="w-10 h-10 rounded-full bg-gradient-to-r from-yellow-400 to-yellow-600 flex items-center justify-center text-white mr-3">
-                    <i class="fas fa-lock"></i>
-                </div>
-                弹幕管理
-            </h2>
-            
-            <div class="admin-panel">
-                <div class="mb-4">
-                    <h3 class="text-lg font-semibold mb-2">弹幕同步状态</h3>
-                    <p id="syncStatus">正在连接公共弹幕库...</p>
-                </div>
-                <button id="refreshDanmu" class="btn-primary">
-                        <i class="fas fa-sync mr-2"></i>手动刷新弹幕
-                    </button>
-            </div>
 
             <div class="admin-section">
             <h2 class="section-title">
                 <div class="section-icon">
                 <i class="fas fa-lock"></i>
                 </div>
-                祝福墙管理
+                弹幕祝福墙管理
             </h2>
             
             <div class="admin-panel glassmorphism">
@@ -1242,6 +1379,15 @@
         const logoutBtn = document.getElementById('logout-btn');
         const clearAllBtn = document.getElementById('clear-all-btn');
         const adminWishContainer = document.getElementById('admin-wish-container');
+        // 替换网易云播放器为外部音频链接
+        const AUDIO_URL = "https://www.xitongmax.com/upload/dance/2/202510/20251006154830283264.mp3";
+        // 初始化音频播放器
+        let birthdayAudio = null;
+        let audioInitialized = false;    
+        // 全局变量存储音频元素
+        let lyricsVisible = false;
+        let danmuInterval;
+        let fireworksStarted = false; // 烟花是否已启动
         // 在全局变量区域添加
         let allWishes = [];
         let isExpanded = false;
@@ -1284,14 +1430,6 @@
             }
             return true;
         }
-
-        
-        // 全局变量存储音频元素
-        let birthdayAudio = null;
-        let audioInitialized = false;
-        let lyricsVisible = false;
-        let danmuInterval;
-        let fireworksStarted = false; // 烟花是否已启动
 
         // // 示例弹幕数据
         const sampleDanmus = [
@@ -1981,9 +2119,76 @@
                 
                 // 重置烟花状态
                 fireworksStarted = false;
-            }, 60000); // 60秒 = 60000毫秒
+            }, 90000); // 60秒 = 60000毫秒
         }
         
+        // 音乐播放器
+        function initAudioPlayer() {
+            if (!birthdayAudio) {
+                birthdayAudio = new Audio(AUDIO_URL);
+                audioInitialized = true;
+                
+                const playPauseBtn = document.getElementById('playPauseBtn');
+                const volumeSlider = document.getElementById('volumeSlider');
+                const progress = document.getElementById('progress');
+                const currentTimeDisplay = document.getElementById('currentTime');
+                const durationDisplay = document.getElementById('duration');
+                const albumCover = document.querySelector('.album-cover');
+                
+                // 播放/暂停按钮事件
+                playPauseBtn.addEventListener('click', function() {
+                    if (birthdayAudio.paused) {
+                        birthdayAudio.play();
+                        playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                        albumCover.classList.add('playing');
+                    } else {
+                        birthdayAudio.pause();
+                        playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                        albumCover.classList.remove('playing');
+                    }
+                });
+                
+                // 音量控制
+                volumeSlider.addEventListener('input', function() {
+                    birthdayAudio.volume = volumeSlider.value;
+                });
+                
+                // 更新进度条和时间显示
+                birthdayAudio.addEventListener('timeupdate', function() {
+                    // 更新进度条
+                    const progressPercent = (birthdayAudio.currentTime / birthdayAudio.duration) * 100;
+                    progress.style.width = `${progressPercent}%`;
+                    
+                    // 更新时间显示
+                    currentTimeDisplay.textContent = formatTime(birthdayAudio.currentTime);
+                });
+                
+                // 音频加载完成后更新总时长
+                birthdayAudio.addEventListener('loadedmetadata', function() {
+                    durationDisplay.textContent = formatTime(birthdayAudio.duration);
+                });
+                
+                // 格式化时间为分:秒
+                function formatTime(seconds) {
+                    const minutes = Math.floor(seconds / 60);
+                    seconds = Math.floor(seconds % 60);
+                    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                }
+                
+                // 点击进度条跳转
+                const progressBar = document.querySelector('.progress-bar');
+                if (progressBar) {
+                    progressBar.addEventListener('click', function(e) {
+                        const rect = progressBar.getBoundingClientRect();
+                        const offsetX = e.clientX - rect.left;
+                        const width = progressBar.clientWidth;
+                        const percent = offsetX / width;
+                        birthdayAudio.currentTime = percent * birthdayAudio.duration;
+                    });
+                }
+            }
+        }
+
         // 显示错误消息
         function showError(message) {
             const errorEl = document.getElementById('errorMessage');
@@ -2128,9 +2333,11 @@
             if (countdownText) countdownText.textContent = "生日快乐！";
             if (birthdayMessage) birthdayMessage.classList.remove('hidden');
             
-            // 显示播放按钮
-            const playButton = document.getElementById('playButton');
-            if (playButton) playButton.style.display = 'block';
+            /// 显示播放器并播放音乐
+            if (!audioInitialized) {
+                initAudioPlayer();
+            }
+        
         }
 
         // 修改祝福卡片渲染函数
@@ -2677,6 +2884,14 @@
             
             // 初始化礼物盒交互
             initGiftInteraction();
+            
+            // 初始化自定义音频播放器
+            const birthdayAudio = new Audio(AUDIO_URL);
+            const playPauseBtn = document.getElementById('playPauseBtn');
+            const volumeSlider = document.getElementById('volumeSlider');
+            const progress = document.getElementById('progress');
+            const currentTimeDisplay = document.getElementById('currentTime');
+            const durationDisplay = document.getElementById('duration');
 
             // 页面加载时初始化弹幕
             initDanmu();
@@ -2684,12 +2899,65 @@
             // 启动定期清理
             scheduleDanmuCleanup();
 
+            // 初始化音频播放器
+            initAudioPlayer();
+
             // 监听页面刷新事件
             window.addEventListener('beforeunload', function() {
                 // 清除弹幕容器
                 const danmuContainer = document.getElementById('danmuContainer');
                 if (danmuContainer) danmuContainer.innerHTML = '';
             });
+
+            // 播放/暂停按钮事件
+            playPauseBtn.addEventListener('click', function() {
+                if (birthdayAudio.paused) {
+                    birthdayAudio.play();
+                    playPauseBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                } else {
+                    birthdayAudio.pause();
+                    playPauseBtn.innerHTML = '<i class="fas fa-play"></i>';
+                }
+            });
+
+            // 音量控制
+            volumeSlider.addEventListener('input', function() {
+                birthdayAudio.volume = volumeSlider.value;
+            });
+
+            // 更新进度条和时间显示
+            birthdayAudio.addEventListener('timeupdate', function() {
+                // 更新进度条
+                const progressPercent = (birthdayAudio.currentTime / birthdayAudio.duration) * 100;
+                progress.style.width = `${progressPercent}%`;
+                
+                // 更新时间显示
+                currentTimeDisplay.textContent = formatTime(birthdayAudio.currentTime);
+            });
+
+            // 音频加载完成后更新总时长
+            birthdayAudio.addEventListener('loadedmetadata', function() {
+                durationDisplay.textContent = formatTime(birthdayAudio.duration);
+            });
+
+            // 格式化时间为分:秒
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                seconds = Math.floor(seconds % 60);
+                return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            }
+
+            // 点击进度条跳转
+            const progressBar = document.querySelector('.progress-bar');
+            if (progressBar) {
+                progressBar.addEventListener('click', function(e) {
+                    const rect = progressBar.getBoundingClientRect();
+                    const offsetX = e.clientX - rect.left;
+                    const width = progressBar.clientWidth;
+                    const percent = offsetX / width;
+                    birthdayAudio.currentTime = percent * birthdayAudio.duration;
+                });
+            }
 
             // 确保 DOM 元素存在后再调用
             if (document.getElementById('days') && 
